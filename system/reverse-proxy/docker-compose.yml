@@ -1,0 +1,25 @@
+version: '3.5'
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:1.7-alpine
+    command: '--acme.email=${ADMIN_EMAIL}'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/traefik.toml
+      - ./acme.json:/acme.json
+    restart: always
+    networks:
+      - traefik-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    labels:
+      - "traefik.frontend.rule=Host:${WEB_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.enable=${WEB_ENABLED-protection:login-disabled-if-empty-string}"
+      - "traefik.port=8080"
+
+networks:
+  traefik-proxy:
+    name: traefik-proxy

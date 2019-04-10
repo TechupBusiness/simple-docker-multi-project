@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  postfix:
+    image: boky/postfix
+    expose:
+      - "587"
+    networks:
+      - internal
+    environment:
+      - "HOSTNAME=${MAIL_HOST}"
+      - "ALLOWED_SENDER_DOMAINS=${MAIL_HOST} ${MAIL_HOST_ALIASES}"

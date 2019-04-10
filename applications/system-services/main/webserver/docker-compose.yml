@@ -1,0 +1,33 @@
+version: '3.5'
+
+services:
+  webserver:
+    build:
+      context: ../../../docker-data/${PROJECT_NAME}/services/main/webserver
+      # Dockerfile will be built by scripts.sh->build() when running compose.sh
+      dockerfile: "generated.Dockerfile"
+      args:
+        - "PHP_VERSION=${PHP_VERSION}-apache"
+        - "PHP_EXTENSIONS=${PHP_EXTENSIONS}"
+        - "APACHE_MODULES=${APACHE_MODULES}"
+        - "APT_LIBS=${APT_LIBS}"
+    restart: always
+    expose:
+      - '80'
+    volumes:
+      - ../../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html
+      - ../../../logs/${PROJECT_NAME}/webserver:/var/log/apache2
+    environment:
+      - WEB_HOST=${WEB_HOST}
+    networks:
+      - proxy
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${LAMP_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${LAMP_TMP_PRIORITY}"
+      - "traefik.port=80"
+      - "traefik.frontend.redirect.regex=^https?://www.(${LAMP_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://$${1}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"

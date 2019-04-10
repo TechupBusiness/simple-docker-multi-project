@@ -1,0 +1,19 @@
+version: '3.5'
+
+services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    networks:
+      - proxy
+      - internal
+    expose:
+      - '80'
+    environment:
+      - "PMA_HOST=mysql"
+      - "PMA_ABSOLUTE_URI=https://${PMA_WEB_HOST}/"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${PMA_WEB_HOST}"
+      - "traefik.frontend.auth.basic.users=${PMA_WEB_AUTH_BASIC}"
+      - "traefik.port=80"

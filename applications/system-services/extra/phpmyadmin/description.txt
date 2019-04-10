@@ -1,0 +1,1 @@
+PHPMyAdmin application for service "mysql", accessible via custom domain.

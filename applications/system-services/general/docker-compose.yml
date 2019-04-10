@@ -1,0 +1,8 @@
+version: '3.5'
+
+networks:
+  proxy:
+    external:
+      name: traefik-proxy
+  internal:
+    external: false

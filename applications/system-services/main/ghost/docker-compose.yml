@@ -1,0 +1,38 @@
+version: '3.5'
+
+services:
+  ghost:
+    image: ghost:2-alpine
+    restart: always
+    volumes:
+      - ../../../instances/${WEB_HOST}/${WEB_ROOT_DOCKER_HOST}:/var/lib/ghost/content
+      - ../../../logs/${WEB_HOST}/ghost:/var/log/ghost
+    expose:
+      - 2368
+    environment:
+      # see https://docs.ghost.org/docs/config#section-running-ghost-with-config-env-variables
+      database__client: mysql
+      database__connection__host: mysql
+      database__connection__user: ${MYSQL_USER}
+      database__connection__password: ${MYSQL_PASSWORD}
+      database__connection__database: ${MYSQL_DATABASE}
+      mail__from: ${GHOST_EMAIL}
+      NODE_ENV: production
+      url: https://${WEB_HOST}
+      logging__path: "/var/log/ghost/"
+      logging__level: "error"
+      logging__level__rotation__enabled: true
+      logging__level__rotation__count: 15
+      logging__level__rotation__period: "1d"
+    networks:
+      - proxy
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=2368"
+      - "traefik.frontend.rule=Host:${LAMP_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${LAMP_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://www.(${LAMP_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://$${1}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
