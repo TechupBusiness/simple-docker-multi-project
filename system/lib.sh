@@ -67,7 +67,7 @@ editEnvInteractiveVariableExecution() {
 
     echo "$DESCRIPTION"
 
-    title="---------- "
+    title=" ========> "
     if [[ "$REQUIRED" = "1" ]]; then
         title="$title!!! "
     fi
@@ -88,6 +88,8 @@ editEnvInteractiveVariableExecution() {
 
         if [ ! -z "$USER" ] && [ ! -z "$PW" ]; then
             NEW_VALUE=$(generate_basic_auth "env" "$USER" "$PW")
+        else
+            NEW_VALUE=""
         fi
     fi
 
@@ -500,15 +502,17 @@ generate_basic_auth() {
     fi
 
     # Checks if htpasswd is available or install it otherwise
-    which htpasswd >/dev/null || (echo "SORRY! NEEDED TO INSTALL APACHE TOOLS (apache2-utils) TO GENERATE THE PASSWORD" && $SUDO apt-get update && $SUDO apt-get install apache2-utils )
+    which htpasswd >/dev/null || ( $SUDO apt-get update && $SUDO apt-get -y install apache2-utils )
 
-    # Generate strings
-    string=$(htpasswd -nbB "$USER" "$PW")
+    if [[ ! -z $(which htpasswd) ]]; then
+        # Generate strings
+        string=$(htpasswd -nbB "$USER" "$PW")
 
-    if [[ $FORMAT == "env" ]]; then
-        echo "$string"
-    else
-        echo "$string" | sed -r 's/\$/\$\$/g'
+        if [[ $FORMAT == "env" ]]; then
+            echo "$string"
+        else
+            echo "$string" | sed -r s/\$/\$\$/g
+        fi
     fi
 }
 
