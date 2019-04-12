@@ -11,7 +11,7 @@ fi
 echo "Welcome! Checking/preparing environment..."
 
 for SCRIPT in *.sh; do
-    if [[ -x "$SCRIPT" ]]; then
+    if [[ ! -x "$SCRIPT" ]]; then
         chmod +x "$SCRIPT"
         echo "Made $SCRIPT executable"
     fi
@@ -27,7 +27,7 @@ else
     echo "OK - acme.json already existing."
 fi
 
-if [[ $(stat --format '%a' acme.json) != "600" ]]; then
+if [[ -f "$path/acme.json" ]] && [[ $(stat --format '%a' "$path/acme.json") != "600" ]]; then
     chmod 600 "$path/acme.json"
     echo "Set permission of acme.json to 600."
 fi
