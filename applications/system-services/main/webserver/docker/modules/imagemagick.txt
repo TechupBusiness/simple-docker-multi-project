@@ -1,0 +1,1 @@
+Installs ImageMagick for advanced image processing

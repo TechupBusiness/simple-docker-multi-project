@@ -24,5 +24,11 @@ generalFieldDescriptions() {
     FIELD="$2"
     PROJECT="$1"
 
-#    echo "SCRIPT-TEST $PROJECT $FIELD"
+    if [[ "$FIELD" == "MAIN_SERVICE" ]]; then
+        display_services "main"
+    elif [[ "$FIELD" == "EXTRA_SERVICES" ]]; then
+        display_services "extra"
+    fi
+
+
 }

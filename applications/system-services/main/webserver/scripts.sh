@@ -107,14 +107,71 @@ webserverInstructions() {
 
     MYSQL_ROOT_PASSWORD="$(configGetValueByFile MYSQL_ROOT_PASSWORD "$PROJECT_ENV")"
     WEB_ROOT_DOCKER_HOST="$(configGetValueByFile WEB_ROOT_DOCKER_HOST "$PROJECT_ENV")"
+    WEB_DIR_APP_HOST="$(configGetValueByFile WEB_DIR_APP_HOST "$PROJECT_ENV")"
+    WEB_DIR_APP_ALIASES="$(configGetValueByFile WEB_DIR_APP_ALIASES "$PROJECT_ENV")"
 
     echo "WEBSERVER"
-    echo "- Copy your website data to applications/instance-data/$PROJECT/$WEB_ROOT_DOCKER_HOST (and remember your set sub-folder settings)"
+    echo "- Copy your website data to applications/instance-data/$PROJECT/$WEB_ROOT_DOCKER_HOST (and remember your set sub-folder settings $WEB_DIR_APP_HOST $WEB_DIR_APP_ALIASES)"
 }
 
 webserverFieldDescriptions() {
     FIELD="$2"
     PROJECT="$1"
 
-    echo "SCRIPT-TEST $PROJECT $FIELD"
+    PROJECT_ENV="applications/docker-data/$PROJECT/.env"
+
+    if [[ "$FIELD" == "WEB_DIR_APP_ALIASES" ]]; then
+        WEB_HOST_ALIASES="$(configGetValueByFile WEB_HOST_ALIASES "$PROJECT_ENV")"
+        WEB_DIR_APP_ALIASES="$(configGetValueByFile WEB_DIR_APP_ALIASES "$PROJECT_ENV")"
+        WEB_ROOT_DOCKER_HOST="$(configGetValueByFile WEB_ROOT_DOCKER_HOST "$PROJECT_ENV")"
+        if [[ -z $WEB_DIR_APP_ALIASES ]]; then
+            WEB_DIR_APP_ALIASES="none!"
+        fi
+        echo "   - Available domains to map: $WEB_HOST_ALIASES"
+        echo "   - The mapped folders need to exist in instance-data/<project>/$WEB_ROOT_DOCKER_HOST"
+    elif [[ "$FIELD" == "DOCKERFILE_MODULES" ]]; then
+
+        echo "  - Available:"
+
+        locations="system custom"
+        for serviceLocation in $locations; do
+            location="applications/$serviceLocation-services/main/webserver/docker/modules"
+            if [[ -d "$location" ]] || [[ -L "$location" ]]; then
+                for moduleFile in $location/*.Dockerfile; do
+                    if [[ -f "$moduleFile" ]]; then
+                        filename=$(basename -- "$moduleFile")
+                        extension="${filename##*.}"
+                        module="${filename%.*}"
+                        if [[ -f "$location/$module.txt" ]]; then
+                            descr=$(cat "$location/$module.txt")
+                            descr=": $descr"
+                        else
+                            descr=""
+                        fi
+                        echo "     \"$module\"$descr"
+                    fi
+                done
+            fi
+        done
+
+        location="applications/docker-data/$PROJECT/services/main/webserver/docker/modules"
+        for projectModule in $location/*.Dockerfile; do
+
+            if [[ -f "$projectModule" ]]; then
+                filename=$(basename -- "$projectModule")
+                extension="${filename##*.}"
+                module="${filename%.*}"
+
+                if [[ -f "$location/$module.txt" ]]; then
+                    descr=$(cat "$location/$module.txt")
+                    descr=": $descr"
+                else
+                    descr=""
+                fi
+                echo "     \"$module\"$descr"
+            fi
+        done
+    fi
+
 }
+

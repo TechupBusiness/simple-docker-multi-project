@@ -196,7 +196,9 @@ editEnv() {
 
                 if [[ "$SCRIPT" == "1" ]]; then
                     FieldDesc=$(runScripts "$SERVICE_TYPE" "$SERVICE_NAME" "FieldDescriptions" "$PROJECT" "${KEYVALUE[0]}")
-                    DESC=$(echo "$DESC" | sed -r "s/\[SCRIPT\]/${FieldDesc}/g")
+                    FieldDesc="$(echo "${FieldDesc}" | sed ':a;N;$!ba;s/\n/\\n /g' | sed 's/[\/&]/\\&/g')"
+                    #echo "FieldDesc: $FieldDesc"
+                    DESC=$(echo "$DESC" | sed "s/\[SCRIPT\]/${FieldDesc}/g" | sed 's/\\n/\n/g')
                 fi
                 # Get existing value from target file
                 TARGET_VALUE=$(configGetValueByFile "${KEYVALUE[0]}" "$ENV_TARGET")
@@ -280,7 +282,7 @@ display_service() {
         if [ -f "$1/description.txt" ]; then
             description=$(cat $1/description.txt)
         fi
-        echo "- $service: $description"
+        echo "- \"$service\": $description"
     fi
 }
 
@@ -361,7 +363,7 @@ applyEnvTemplateInteractive() {
         fi
 
         if [ -f "$location/template.env" ]; then
-            editEnv "$location/template.env" "$PROJECT_ENV" "interactive" "$serviceName" "serviceType" "$PROJECT"
+            editEnv "$location/template.env" "$PROJECT_ENV" "interactive" "$serviceName" "$serviceType" "$PROJECT"
             break
         fi
     done
