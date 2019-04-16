@@ -88,6 +88,9 @@ editEnvInteractiveVariableExecution() {
 
         if [ ! -z "$USER" ] && [ ! -z "$PW" ]; then
             NEW_VALUE=$(generate_basic_auth "env" "$USER" "$PW")
+            if [[ -z $NEW_VALUE ]]; then
+                echo "OOPS... something went wrong. Maybe htpasswd is not present on your system. Please run install.sh to check your system."
+            fi
         else
             NEW_VALUE=""
         fi
@@ -503,9 +506,7 @@ generate_basic_auth() {
         SUDO='sudo'
     fi
 
-    # Checks if htpasswd is available or install it otherwise
-    which htpasswd >/dev/null || ( $SUDO apt-get update && $SUDO apt-get -y install apache2-utils )
-
+    # Checks if htpasswd is available
     if [[ ! -z $(which htpasswd) ]]; then
         # Generate strings
         string=$(htpasswd -nbB "$USER" "$PW")
@@ -567,4 +568,14 @@ stepRunEnv() {
         applyEnvTemplateInteractive "extra" "$service" "$PROJECT"
     done
 
+}
+
+# $1 = Command
+# $2 = URL/Notes for command installation
+requireCommand() {
+    testCommand = $1
+    notes=""
+    if [[ ! -z "$2" ]]; then notes="($2)"; fi
+
+    (command -v $testCommand >/dev/null 2>&1) || { echo >&2 "ERROR: Can't install, $testCommand is missing! Please install it manually $notes and try again to run ./install.sh."; exit 1; }
 }
