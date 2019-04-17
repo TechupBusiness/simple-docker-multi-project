@@ -8,6 +8,45 @@
 #
 #}
 
+generalBuild() {
+    PROJECT="$1"
+    ENV_FILE="applications/docker-data/$PROJECT/.env"
+
+    # Get some variables from env
+    WEB_HOST=$(configGetValueByFile WEB_HOST "$ENV_FILE")
+    WEB_HOST_ALIASES=$(configGetValueByFile WEB_HOST_ALIASES "$ENV_FILE")
+
+    # Set custom environment variables
+    PROXY_TMP_PRIORITY=100
+    PROXY_TMP_FE_HOST="$WEB_HOST,www.$WEB_HOST"
+    PROXY_TMP_REGEX_REDIRECT="$WEB_HOST"
+
+    for alias in $WEB_HOST_ALIASES; do
+        PROXY_TMP_FE_HOST="$PROXY_TMP_FE_HOST,$alias,www.$alias"
+        PROXY_TMP_REGEX_REDIRECT="$PROXY_TMP_REGEX_REDIRECT|$alias"
+    done
+
+    if [ -z "$WEB_HOST" ]; then
+        echo "Could not find defined WEB_HOST in $ENV_FILE"
+        exit
+    fi
+
+    WEB_PATHS=$(configGetValueByFile WEB_PATHS "$ENV_FILE")
+    if [ ! -z "$WEB_PATHS" ]; then
+        PROXY_TMP_FE_HOST="$PROXY_TMP_FE_HOST;PathPrefix:"
+        for webPath in $WEB_PATHS; do
+            if [ "$webPath" = "/" ]; then
+                PROXY_TMP_PRIORITY=1
+            fi
+            PROXY_TMP_FE_HOST="$PROXY_TMP_FE_HOST$webPath,"
+        done
+    fi
+    configReplaceValue $ENV_FILE "PROXY_TMP_PRIORITY" "$PROXY_TMP_PRIORITY"
+    configReplaceValue $ENV_FILE "PROXY_TMP_FE_HOST" "$PROXY_TMP_FE_HOST"
+    configReplaceValue $ENV_FILE "PROXY_TMP_REGEX_REDIRECT" "$PROXY_TMP_REGEX_REDIRECT"
+
+}
+
 generalInstructions() {
     PROJECT="$1"
     ENV_FILE="applications/docker-data/$PROJECT/.env"

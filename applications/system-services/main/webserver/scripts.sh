@@ -30,36 +30,9 @@ webserverBuild() {
         fi
     done
 
-    # Set custom environment variables
-    LAMP_TMP_PRIORITY=100
-    LAMP_TMP_FE_HOST="$WEB_HOST,www.$WEB_HOST"
-    LAMP_TMP_REGEX_REDIRECT="$WEB_HOST"
-
     for alias in $WEB_HOST_ALIASES; do
-        LAMP_TMP_FE_HOST="$LAMP_TMP_FE_HOST,$alias,www.$alias"
-        LAMP_TMP_REGEX_REDIRECT="$LAMP_TMP_REGEX_REDIRECT|$alias"
-
         [[ ! "${HOST_DIR_MAPPING[$alias]+foobar}" ]] && WEB_HOST_FREE_ALIASES="$WEB_HOST_FREE_ALIASES $alias"
     done
-
-    if [ -z "$WEB_HOST" ]; then
-        echo "Could not find defined WEB_HOST in $ENV_FILE"
-        exit
-    fi
-
-    WEB_PATHS=$(configGetValueByFile WEB_PATHS "$ENV_FILE")
-    if [ ! -z "$WEB_PATHS" ]; then
-        LAMP_TMP_FE_HOST="$LAMP_TMP_FE_HOST;PathPrefix:"
-        for webPath in $WEB_PATHS; do
-            if [ "$webPath" = "/" ]; then
-                LAMP_TMP_PRIORITY = 1
-            fi
-            LAMP_TMP_FE_HOST="$LAMP_TMP_FE_HOST$webPath,"
-        done
-    fi
-    configReplaceValue $ENV_FILE "LAMP_TMP_PRIORITY" "$LAMP_TMP_PRIORITY"
-    configReplaceValue $ENV_FILE "LAMP_TMP_FE_HOST" "$LAMP_TMP_FE_HOST"
-    configReplaceValue $ENV_FILE "LAMP_TMP_REGEX_REDIRECT" "$LAMP_TMP_REGEX_REDIRECT"
 
 
     # Build Dockerfile
