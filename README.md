@@ -273,6 +273,14 @@ Each service should have at least the following default files:
 - **scripts.sh**: Script file with specific "interface" (possible functions according to a naming schema - see next chapter for more details)
 - **template.env**: Contains all variables, that are needed to configure the service
 
+### docker-compose.yml
+**IMPORTANT:** the directory context for all path specifications is `applications/docker-data/MY-PROJECT`. To access folders like `instance-data` or `logs` or sub-folders of the service, you need to go two folder-levels up first:
+```
+../../instance-data
+../../logs
+../../custom-services/main/MyService
+```
+
 ### scripts.sh
 It can contain the following methods, which are triggered (replace "{service}" with the name of your service = folder name of the service):
 

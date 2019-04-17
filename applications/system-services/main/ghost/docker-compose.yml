@@ -5,8 +5,8 @@ services:
     image: ghost:2-alpine
     restart: always
     volumes:
-      - ../../../instances/${WEB_HOST}/${WEB_ROOT_DOCKER_HOST}:/var/lib/ghost/content
-      - ../../../logs/${WEB_HOST}/ghost:/var/log/ghost
+      - ../../instances/${WEB_HOST}/${WEB_ROOT_DOCKER_HOST}:/var/lib/ghost/content
+      - ../../logs/${WEB_HOST}/ghost:/var/log/ghost
     expose:
       - 2368
     environment:

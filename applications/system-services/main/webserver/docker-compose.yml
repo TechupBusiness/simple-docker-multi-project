@@ -3,7 +3,7 @@ version: '3.5'
 services:
   webserver:
     build:
-      context: ../../../docker-data/${PROJECT_NAME}/services/main/webserver
+      context: ../../docker-data/${PROJECT_NAME}/services/main/webserver
       # Dockerfile will be built by scripts.sh->build() when running compose.sh
       dockerfile: "generated.Dockerfile"
       args:
@@ -15,8 +15,8 @@ services:
     expose:
       - '80'
     volumes:
-      - ../../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html
-      - ../../../logs/${PROJECT_NAME}/webserver:/var/log/apache2
+      - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html
+      - ../../logs/${PROJECT_NAME}/webserver:/var/log/apache2
     environment:
       - WEB_HOST=${WEB_HOST}
     networks:
