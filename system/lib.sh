@@ -300,7 +300,7 @@ display_services() {
 
     existingServices=""
     for serviceType in "$1"; do
-        for serviceLocation in "project custom system"; do
+        for serviceLocation in project custom system; do
 
             if [[ "$serviceLocation" == "project" ]]; then
                 location="applications/docker-data/$PROJECT/services/$serviceType"
@@ -310,7 +310,7 @@ display_services() {
 
             for servicePath in $location/*; do
                 service=$(basename "$servicePath")
-                if [[ ! isIn "$service" "$existingServices" ]]; then
+                if [[ ! $(isIn "$service" "$existingServices") ]]; then
                     display_service "$service" "$servicePath"
                     existingServices="$existingServices $service"
                 fi
@@ -329,15 +329,15 @@ has_service() {
     if [ -z "$3" ]; then
         3="main extra";
     fi
-    for serviceType in "$2"; do
-        for serviceLocation in "system custom project"; do
+    serviceTypes="$3"
+    for serviceType in $serviceTypes; do
+        for serviceLocation in system custom project; do
 
             if [[ "$serviceLocation" == "project" ]]; then
                 location="applications/docker-data/$PROJECT/services/$serviceType"
             else
                 location="applications/${serviceLocation}-services/${serviceType}"
             fi
-
             for service in $location/*; do
                 serviceName=$(basename "$service")
                 if [[ "$serviceName" == "$1" ]]; then

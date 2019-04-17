@@ -93,8 +93,10 @@ webserverBuild() {
         done
     done
 
-    for projectModule in "applications/docker-data/$PROJECT/services/main/webserver/docker/modules/*.Dockerfile"; do
-        cat $projectModule >> "$BUILD_DOCKERFILE"
+    for projectModule in applications/docker-data/$PROJECT/services/main/webserver/docker/modules/*.Dockerfile; do
+        if [ -f "$projectModule" ]; then
+            cat "$projectModule" >> "$BUILD_DOCKERFILE"
+        fi
     done
 
     cat $PATH_SYSTEM_SERVICE/docker/end.Dockerfile >> "$BUILD_DOCKERFILE"
