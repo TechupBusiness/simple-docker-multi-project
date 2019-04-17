@@ -25,9 +25,9 @@ generalFieldDescriptions() {
     PROJECT="$1"
 
     if [[ "$FIELD" == "MAIN_SERVICE" ]]; then
-        display_services "main"
+        display_services "$PROJECT" "main"
     elif [[ "$FIELD" == "EXTRA_SERVICES" ]]; then
-        display_services "extra"
+        display_services "$PROJECT" "extra"
     fi
 
 

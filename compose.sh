@@ -23,14 +23,14 @@ if [ -f "$ENV_FILE" ]; then
     # Check for modules installed
     MAIN_SERVICE=$(configGetValueByFile MAIN_SERVICE "$ENV_FILE")
     EXTRA_SERVICES=$(configGetValueByFile EXTRA_SERVICES "$ENV_FILE")
-    HAS_MAIN_SERVICE=$(has_service "$MAIN_SERVICE" "main")
+    HAS_MAIN_SERVICE=$(has_service "$MAIN_SERVICE" "$PROJECT" "main")
     if [[ "$HAS_MAIN_SERVICE" = "0" ]]; then
         echo "MAIN SERVICE \"$MAIN_SERVICE\" DOES NOT EXIST!"
         exit
     fi
     EXTRA_SERVICES=$(configGetValueByFile EXTRA_SERVICES "$ENV_FILE")
     for service in $EXTRA_SERVICES; do
-        HAS_EXTRA_SERVICE=$(has_service "$service" "extra")
+        HAS_EXTRA_SERVICE=$(has_service "$service" "$PROJECT" "extra")
         if [[ "$HAS_EXTRA_SERVICE" = "0" ]]; then
             echo "EXTRA SERVICE \"$service\" DOES NOT EXIST."
             exit

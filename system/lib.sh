@@ -278,44 +278,67 @@ ${line#"#"}"
 
 # $1 service-id
 display_service() {
-    service=$(basename "$1")
+    service="$1"
+    path="$2"
 
     if [ "$service" != "*" ]; then
         description=""
-        if [ -f "$1/description.txt" ]; then
-            description=$(cat $1/description.txt)
+        if [ -f "$path/description.txt" ]; then
+            description=$(cat $path/description.txt)
         fi
         echo "- \"$service\": $description"
     fi
 }
 
-# $1 OPTIONAL service-type "main" or "extra", default: "main extra"
+# $1 project
+# $2 OPTIONAL service-type "main" or "extra", default: "main extra"
 display_services() {
-    if [ -z "$1" ]; then
-        1="main extra";
+    PROJECT="$1"
+    if [ -z "$2" ]; then
+        2="main extra";
     fi
-    locations="system custom"
+
+    existingServices=""
     for serviceType in "$1"; do
-        for serviceLocation in $locations; do
-            location="applications/$serviceLocation-services/$serviceType/*/"
-            for service in $location; do
-                display_service "$service"
+        for serviceLocation in "project custom system"; do
+
+            if [[ "$serviceLocation" == "project" ]]; then
+                location="applications/docker-data/$PROJECT/services/$serviceType"
+            else
+                location="applications/${serviceLocation}-services/${serviceType}"
+            fi
+
+            for servicePath in $location/*; do
+                service=$(basename "$servicePath")
+                if [[ ! isIn "$service" "$existingServices" ]]; then
+                    display_service "$service" "$servicePath"
+                    existingServices="$existingServices $service"
+                fi
             done
         done
     done
 }
 
 # $1 REQUIRED service-id
-# $2 OPTIONAL service-type "main" or "extra", default: "main extra"
+# $2 project
+# $3 OPTIONAL service-type "main" or "extra", default: "main extra"
 # return: echo "0" (not existing) or "1" (existing)
 has_service() {
-    echo "has-service: $@"
-    if [ -z "$2" ]; then
-        2="main extra";
+    PROJECT="$2"
+
+    if [ -z "$3" ]; then
+        3="main extra";
     fi
     for serviceType in "$2"; do
-        for serviceLocation in "system custom"; do
-            for service in "applications/$serviceLocation-services/$serviceType/*"; do
+        for serviceLocation in "system custom project"; do
+
+            if [[ "$serviceLocation" == "project" ]]; then
+                location="applications/docker-data/$PROJECT/services/$serviceType"
+            else
+                location="applications/${serviceLocation}-services/${serviceType}"
+            fi
+
+            for service in $location/*; do
                 serviceName=$(basename "$service")
                 if [[ "$serviceName" == "$1" ]]; then
                     echo "1"
