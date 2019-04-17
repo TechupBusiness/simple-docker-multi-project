@@ -17,16 +17,16 @@ RUN apt-get -y update \
 
 # Copy production template
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
-
+    \
     { \
     echo 'error_log = php_errors.log'; \
 	} > /usr/local/etc/php/conf.d/error.ini && \
-
+    \
     docker-php-ext-install iconv mysqli mbstring $PHP_EXTENSIONS && \
-
+    \
     # Enable Apache modules
     a2enmod rewrite expires headers $APACHE_MODULES && \
-
+    \
     # VHOST
     { \
     echo 'ServerName ${WEB_HOST}'; \
