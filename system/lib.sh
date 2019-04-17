@@ -297,9 +297,9 @@ display_services() {
     if [ -z "$2" ]; then
         2="main extra";
     fi
-
+    serviceTypes="$2"
     existingServices=""
-    for serviceType in "$1"; do
+    for serviceType in $serviceTypes; do
         for serviceLocation in project custom system; do
 
             if [[ "$serviceLocation" == "project" ]]; then
@@ -309,10 +309,13 @@ display_services() {
             fi
 
             for servicePath in $location/*; do
-                service=$(basename "$servicePath")
-                if [[ ! $(isIn "$service" "$existingServices") ]]; then
-                    display_service "$service" "$servicePath"
-                    existingServices="$existingServices $service"
+                if [[ -d $servicePath ]] || [[ -L $servicePath ]]; then
+                    service=$(basename "$servicePath")
+                    found=$(isIn "$service" "$existingServices")
+                    if [[ $found == "0" ]]; then
+                        display_service "$service" "$servicePath"
+                        existingServices="$existingServices $service"
+                    fi
                 fi
             done
         done
