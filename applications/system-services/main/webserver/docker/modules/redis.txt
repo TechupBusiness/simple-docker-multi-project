@@ -1,0 +1,1 @@
+Add the PHP module for redis (please also install a redis service then!)

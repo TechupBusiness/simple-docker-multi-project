@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+  redis:
+    image: redis:${REDIS_VERSION}
+    restart: always
+    networks:
+      - internal
+    command: ["redis-server", "--appendonly", "yes"]
+    expose:
+      - 6379
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

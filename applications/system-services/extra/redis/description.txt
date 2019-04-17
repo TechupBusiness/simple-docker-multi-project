@@ -1,0 +1,1 @@
+A redis cache server (hostname: "redis", port: 6379)
