@@ -376,7 +376,7 @@ runScript() {
 # $1: type "main" "extra"
 # $2: service name
 applyEnvTemplateInteractive() {
-    locations="project custom system"
+    locations="system custom project"
     serviceType="$1"
     serviceName="$2"
     PROJECT="$3"
@@ -390,7 +390,6 @@ applyEnvTemplateInteractive() {
 
         if [ -f "$location/template.env" ]; then
             editEnv "$location/template.env" "$PROJECT_ENV" "interactive" "$serviceName" "$serviceType" "$PROJECT"
-            break
         fi
     done
 }
@@ -401,7 +400,7 @@ applyEnvTemplateInteractive() {
 # $4 Project
 # $5 Meta data
 runScripts() {
-    locations="project custom system"
+    locations="system custom project"
     serviceType="$1"
     serviceName="$2"
     methods="$3"
@@ -421,7 +420,6 @@ runScripts() {
 
             if [ -f "$location/scripts.sh" ]; then
                 runScript "$location" "$methods" "$PROJECT" "$serviceName" $Meta
-                break
             fi
         done
     fi
