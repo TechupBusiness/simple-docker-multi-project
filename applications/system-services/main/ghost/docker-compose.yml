@@ -30,9 +30,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.port=2368"
-      - "traefik.frontend.rule=Host:${LAMP_TMP_FE_HOST}"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
       - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
-      - "traefik.frontend.priority=${LAMP_TMP_PRIORITY}"
-      - "traefik.frontend.redirect.regex=^https?://www.(${LAMP_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://www.(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
       - "traefik.frontend.redirect.replacement=https://$${1}/$${2}"
       - "traefik.frontend.redirect.permanent=true"
