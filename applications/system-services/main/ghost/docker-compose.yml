@@ -29,6 +29,6 @@ services:
       - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
       - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
       - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
-      - "traefik.frontend.redirect.regex=^https?://www.(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
-      - "traefik.frontend.redirect.replacement=https://$${1}/$${2}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
       - "traefik.frontend.redirect.permanent=true"

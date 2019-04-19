@@ -281,6 +281,20 @@ Each service should have at least the following default files:
 ../../custom-services/main/MyService
 ```
 
+All "main" services must implement the following labels, to work properly with the general configuration:
+```
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.port=80"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
+```
+NOTE: Specification of multiple redirects may come in traefik 2.0
+
 ### scripts.sh
 It can contain the following methods, which are triggered (replace "{service}" with the name of your service = folder name of the service):
 
@@ -392,3 +406,6 @@ This is ok if you did not set a value for this configuration setting. Only if yo
 
 ### I can't scroll trough the output of ./compose.sh MYPROJECT logs
 You can use less. Simply run `./compose.sh MYPROJECT logs MYSERVICE | less -R`.
+
+### My certificates are self-signed
+Please go to the reverse-proxy logs and check what is written in there: `cd system/reverse-proxy && sudo docker-compose logs | less -R`.

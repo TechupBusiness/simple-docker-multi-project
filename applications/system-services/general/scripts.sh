@@ -15,15 +15,19 @@ generalBuild() {
     # Get some variables from env
     WEB_HOST=$(configGetValueByFile WEB_HOST "$ENV_FILE")
     WEB_HOST_ALIASES=$(configGetValueByFile WEB_HOST_ALIASES "$ENV_FILE")
+    WEB_HOST_REDIRECTS=$(configGetValueByFile WEB_HOST_REDIRECTS "$ENV_FILE")
 
     # Set custom environment variables
     PROXY_TMP_PRIORITY=100
-    PROXY_TMP_FE_HOST="$WEB_HOST,www.$WEB_HOST"
+    PROXY_TMP_FE_HOST="$WEB_HOST"
     PROXY_TMP_REGEX_REDIRECT="$WEB_HOST"
 
     for alias in $WEB_HOST_ALIASES; do
-        PROXY_TMP_FE_HOST="$PROXY_TMP_FE_HOST,$alias,www.$alias"
-        PROXY_TMP_REGEX_REDIRECT="$PROXY_TMP_REGEX_REDIRECT|$alias"
+        PROXY_TMP_FE_HOST="$PROXY_TMP_FE_HOST,$alias"
+    done
+
+    for redirect in $WEB_HOST_REDIRECTS; do
+        PROXY_TMP_REGEX_REDIRECT="$PROXY_TMP_REGEX_REDIRECT|$redirect"
     done
 
     if [ -z "$WEB_HOST" ]; then
