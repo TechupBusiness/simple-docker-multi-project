@@ -386,3 +386,9 @@ In case you really need it, you could add a custom-service with an FTP, linked t
 If this does not disappear automatically, it means that it could not sucessfully acquire a Let's encrypt SSL certificate.
 You need to restart your application service (`./compose.sh {MY-PROJECT} {SERVICE-NAME} stop && ./compose.sh {MY-PROJECT} {SERVICE-NAME} up -d`), so it can try again to get a certificate. This usually happens if
 you start the webserver but the domain is still pointing to another server.
+
+### I get the message "WARNING: The WEB_ROOT_DOCKER_HOST variable is not set. Defaulting to a blank string."
+This is ok if you did not set a value for this configuration setting. Only if you put your files in a sub-folder of `applications/instance-data/PROJECT`, you need to specify this value.
+
+### I can't scroll trough the output of ./compose.sh MYPROJECT logs
+You can use less. Simply run `./compose.sh MYPROJECT logs MYSERVICE | less -R`.
