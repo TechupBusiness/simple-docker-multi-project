@@ -6,6 +6,6 @@ jobsBuild() {
     path="applications/cronjobs/$PROJECT"
     if [ ! -d "$path" ] && [ ! -L "$path" ]; then
         mkdir -p "$path"
-        cp -R "applications/system-services/extra/jobs/data/template/*" "$path/"
+        cp -R applications/system-services/extra/jobs/data/template/* "$path/"
     fi
 }
