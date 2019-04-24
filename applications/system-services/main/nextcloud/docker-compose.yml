@@ -1,0 +1,35 @@
+version: '3.5'
+
+services:
+  ghost:
+    image: nextcloud:stable-fpm
+    restart: always
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html/data
+      - nextcloud_config:/var/www/html/config
+      - nextcloud_apps:/var/www/html/apps
+    expose:
+      - 9000
+    environment:
+      - "REDIS_HOST=redis"
+      - "MYSQL_DATABASE=${MYSQL_DATABASE}"
+      - "MYSQL_USER=${MYSQL_USER}"
+      - "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+      - "MYSQL_HOST=mysql"
+      - "NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}"
+      - "NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}"
+    networks:
+      - proxy
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=9000"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
+
+volumes:
+  nextcloud_config:
