@@ -1,13 +1,13 @@
 version: '3.5'
 
 services:
-  ghost:
+  nextcloud:
     image: nextcloud:stable-fpm
     restart: always
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html/data
-      - nextcloud_config:/var/www/html/config
-      - nextcloud_apps:/var/www/html/apps
+      - config:/var/www/html/config
+      - apps:/var/www/html/apps
     expose:
       - 9000
     environment:
@@ -32,4 +32,5 @@ services:
       - "traefik.frontend.redirect.permanent=true"
 
 volumes:
-  nextcloud_config:
+  config:
+  apps:
