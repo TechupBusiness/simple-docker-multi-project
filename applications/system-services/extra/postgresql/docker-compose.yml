@@ -1,0 +1,19 @@
+version: '3.5'
+
+services:
+  postgresql:
+    image: postgres:${POSTGRES_VERSION}
+    expose:
+      - 5432
+    restart: always
+    networks:
+      - internal
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+volumes:
+  pgdata:
