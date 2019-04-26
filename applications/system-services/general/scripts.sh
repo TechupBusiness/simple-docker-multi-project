@@ -30,9 +30,10 @@ generalBuild() {
         PROXY_TMP_REGEX_REDIRECT="$PROXY_TMP_REGEX_REDIRECT|$redirect"
     done
 
-    if [ -z "$WEB_HOST" ]; then
-        echo "Could not find defined WEB_HOST in $ENV_FILE"
-        exit
+    if [[ -z "$WEB_HOST" ]]; then
+        configReplaceValue $ENV_FILE "PROXY_TMP_DISABLED" "false"
+    else
+        configReplaceValue $ENV_FILE "PROXY_TMP_DISABLED" "true"
     fi
 
     WEB_PATHS=$(configGetValueByFile WEB_PATHS "$ENV_FILE")

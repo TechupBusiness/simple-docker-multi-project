@@ -17,7 +17,7 @@ services:
       - proxy
       - internal
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=${PROXY_TMP_DISABLED}"
       - "traefik.port=${NODEJS_PORT}"
       - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
       - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
