@@ -57,6 +57,8 @@ Extra services supports the main service of a project (e.g. a database or email 
   - mysql: MariaDB database
   - phpmyadmin: Control panel for mysql/mariaDB
   - redis: String cache
+  - postgresql: PostgreSQL database
+  - pgadmin: PostgreSQL database admin panel
 
 ## Under the hood - services in the spot-light
 All services have a file `template.env` which contains all available configuration options (including descriptions). Running `./project.sh {PROJECT}` allows to interactively (re)configure these settings
