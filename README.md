@@ -45,12 +45,14 @@ Extra services supports the main service of a project (e.g. a database or email 
   - traefik: reverse proxy to route incoming http/https traffic for multiple domains to your containerized services/applications
 - Main
   - webserver (apache+PHP): generic for all php applications out there
-  - ghost (publishing application on nodeJS, alternative to wordpress etc.)
+  - ghost: publishing application on nodeJS, alternative to wordpress etc.)
+  - nextcloud: open source, self-hosted file share and communication platform (like Dropbox, Google Drive, Box.com, ...)
 - Extra
   - email: Postfix server to send emails
   - jobs: Cronjobs, includes a backup for database (mariaDB)
   - mysql: MariaDB database
   - phpmyadmin: Control panel for mysql/mariaDB
+  - redis: String cache
 
 ## Under the hood - services in the spot-light
 All services have a file `template.env` which contains all available configuration options (including descriptions). Running `./project.sh {PROJECT}` allows to interactively (re)configure these settings
