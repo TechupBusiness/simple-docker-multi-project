@@ -47,6 +47,7 @@ Extra services supports the main service of a project (e.g. a database or email 
   - webserver (apache+PHP): generic for all php applications out there
   - ghost: publishing application on nodeJS, alternative to wordpress etc.)
   - nextcloud: open source, self-hosted file share and communication platform (like Dropbox, Google Drive, Box.com, ...)
+  - nodejs: generic for all node.js applications
 - Extra
   - email: Postfix server to send emails
   - jobs: Cronjobs, includes a backup for database (mariaDB)

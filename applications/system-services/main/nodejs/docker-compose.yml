@@ -1,0 +1,27 @@
+version: '3.5'
+
+services:
+  nodejs:
+    image: node:${NODEJS_VERSION}
+    restart: always
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/app
+    expose:
+      - "${NODEJS_PORT}"
+    env_file:
+      - ../../docker-data/${PROJECT_NAME}/.env
+    environment:
+      - NODE_ENV=${NODEJS_ENVIRONMENT}
+    command: cd /app && su -c "npm install" node && su -c "node ${NODEJS_STARTUP_FILE}" node
+    networks:
+      - proxy
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=${NODEJS_PORT}"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
