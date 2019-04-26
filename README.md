@@ -6,6 +6,9 @@ At the moment is is focussing on web-applications and web-APIs, serving all proj
 Docker knowledge is not required to get started, all services can be configured in a single `.env` file.
 Having Docker knowledge allows to add new and extend existing services (databases, caches, ...). Pull requests are welcome! 
 
+If you need a cloud infrastructure for multiple server (like kubernetes or docker swarm), you better start using another project. 
+Cloud functionality will maybe come one day to this project, but not for now.
+
 The "shipped" system services are mostly using official repositories. Therefore all projects created by this setup
 will be always up-to-date, even if there is no update in this project. It's just an architecture "helper", not an application.
 
