@@ -12,7 +12,7 @@ services:
       - ../../docker-data/${PROJECT_NAME}/.env
     environment:
       - NODE_ENV=${NODEJS_ENVIRONMENT}
-    command: cd /app && su -c "npm install" node && su -c "node ${NODEJS_STARTUP_FILE}" node
+    command: cd /app && su -c "npm install --${NODEJS_ENVIRONMENT}" node && su -c "node ${NODEJS_STARTUP_FILE}" node
     networks:
       - proxy
       - internal
