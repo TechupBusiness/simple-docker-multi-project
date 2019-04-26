@@ -412,3 +412,11 @@ You can use less. Simply run `./compose.sh MYPROJECT logs MYSERVICE | less -R`.
 
 ### My certificates are self-signed
 Please go to the reverse-proxy logs and check what is written in there: `cd system/reverse-proxy && sudo docker-compose logs | less -R`.
+
+### How can I add my own ENV variables to be accessible within my main service container
+This works for `webservice` and `nodejs` so far.
+1. The good approach (to allow configuration via `project.sh`):   
+Add a custom "extra" service to the project and create a file `template.env`. Please read the chapter "template.env", how this file should look like.
+All variables that you add in this file can be edited when you call `./project.sh MY-PROJECT`.
+2. The not recommended approach (will **not** allow configuration via `project.sh`):   
+Add the variables manually to the projects' `.env` file in `applications/docker-data/MY-PROJECT/.env`.

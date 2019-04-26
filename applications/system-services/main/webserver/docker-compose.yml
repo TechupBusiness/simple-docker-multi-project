@@ -17,8 +17,8 @@ services:
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html
       - ../../logs/${PROJECT_NAME}/webserver:/var/log/apache2
-    environment:
-      - WEB_HOST=${WEB_HOST}
+    env_file:
+      - ../../docker-data/${PROJECT_NAME}/.env
     networks:
       - proxy
       - internal
