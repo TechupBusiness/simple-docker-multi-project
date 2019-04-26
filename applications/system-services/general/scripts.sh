@@ -60,7 +60,8 @@ generalInstructions() {
     echo "GENERAL:"
     echo "- Read README.md"
     echo "- Point your domain $WEB_HOST to this server (DNS)"
-    echo "- Wait for TTL expiration to finish the DNS change (otherwise your free SSL certificate will not be valid), then run: ./compose.sh $PROJECT up -d"
+    echo "- Wait for TTL expiration to finish the DNS change (otherwise your free SSL certificate will not be valid)"
+    echo "- Run: \"./compose.sh $PROJECT up -d\" to start your project"
 }
 
 generalFieldDescriptions() {
