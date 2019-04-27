@@ -159,6 +159,7 @@ editEnv() {
     MODE="$3"
     SERVICE_TYPE="$5"
     PROJECT="$6"
+    PRINT_CONFIG_HEADER=""
 
     if [ "$MODE" = "interactive" ]; then
         SERVICE_NAME="$4"
@@ -169,11 +170,12 @@ editEnv() {
         exit
     else
         if [ ! -z "$SERVICE_NAME" ]; then
-            echo "##########################################
+            PRINT_CONFIG_HEADER="##########################################
 #
 # SERVICE $SERVICE_NAME
 #
 ##########################################"
+            echo "$PRINT_CONFIG_HEADER"
         fi
 
         BEGIN_DESC=0
@@ -257,10 +259,10 @@ ${line#"#"}"
         APPENDED_VAR="0"
         for KEY in "${KEYS[@]}"; do
 
-            if [ -z $(configGetVariableByFile "$KEY" "$ENV_TARGET") ]; then
+            if [[ -z $(configGetVariableByFile "$KEY" "$ENV_TARGET") ]]; then
                 if [[ "$APPENDED_VAR" == "0" ]]; then
                     touchFile "$ENV_TARGET"
-                    echo "$SERVICE_NAME" >> "$ENV_TARGET"
+                    echo "$PRINT_CONFIG_HEADER" >> "$ENV_TARGET"
                 fi
                 appendEnvVariableToFile "$ENV_TARGET" "$KEY" "${VALUES[$KEY]}" "${DESCRIPTIONS[$KEY]}"
                 APPENDED_VAR="1"

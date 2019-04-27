@@ -91,7 +91,7 @@ if [[ -f "$path/acme.json" ]] && [[ $(stat --format '%a' "$path/acme.json") != "
     echo "Set permission of acme.json to 600."
 fi
 
-editEnv "$path/template.env" "$path/.env" "interactive" "Reverse-Proxy settings"
+editEnv "$path/template.env" "$path/.env" "interactive" "reverseproxy"
 
 echo "Starting reverse-proxy..."
 
