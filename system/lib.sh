@@ -597,9 +597,9 @@ stepRunEnv() {
 # $1 = Command
 # $2 = URL/Notes for command installation
 requireCommand() {
-    testCommand = $1
+    testCommand = "$1"
     notes=""
     if [[ ! -z "$2" ]]; then notes="($2)"; fi
 
-    (command -v $testCommand >/dev/null 2>&1) || { echo >&2 "ERROR: Can't install, $testCommand is missing! Please install it manually $notes and try again to run ./install.sh."; exit 1; }
+    (command -v "$testCommand" >/dev/null 2>&1) || { echo >&2 "ERROR: Can't install, $testCommand is missing! Please install it manually $notes and try again to run ./install.sh."; exit 1; }
 }
