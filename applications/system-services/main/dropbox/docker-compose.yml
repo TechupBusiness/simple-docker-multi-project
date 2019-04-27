@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  dropbox:
+    build:
+      context: ../../system-services/main/dropbox
+      dockerfile: "Dockerfile"
+    restart: always
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/home/dropbox/Dropbox
+      - dropbox_data:/home/dropbox/.dropbox
+      - dropbox_dist:/home/dropbox/.dropbox-dist
+    networks:
+      - internal
+
+volumes:
+  dropbox_data:
+  dropbox_dist:
