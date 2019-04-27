@@ -1,12 +1,14 @@
 #!/bin/bash
 
-#Setup() {
-#
-#}
-#
-#Build() {
-#
-#}
+generalSetup() {
+    PROJECT="$1"
+    ENV_FILE="applications/docker-data/$PROJECT/.env"
+
+    WEB_ROOT_DOCKER_HOST=$(configGetValueByFile WEB_ROOT_DOCKER_HOST "$ENV_FILE")
+
+    mkdir -p "applications/instance-data/$PROJECT/$WEB_ROOT_DOCKER_HOST"
+    mkdir -p "applications/logs/$PROJECT"
+}
 
 generalBuild() {
     PROJECT="$1"
