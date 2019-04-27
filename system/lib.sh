@@ -597,7 +597,7 @@ stepRunEnv() {
 # $1 = Command
 # $2 = URL/Notes for command installation
 requireCommand() {
-    testCommand = "$1"
+    testCommand="$1"
     notes=""
     if [[ ! -z "$2" ]]; then notes="($2)"; fi
 
