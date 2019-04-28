@@ -2,7 +2,9 @@ version: '3.5'
 
 services:
   nextcloud:
-    image: nextcloud:production-apache
+    build:
+      context: ../../system-services/main/nextcloud
+      dockerfile: "Dockerfile"
     restart: always
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html/data
@@ -10,12 +12,12 @@ services:
       - apps:/var/www/html/apps
     expose:
       - 80
+    env_file:
+      - ../../docker-data/${PROJECT_NAME}/.env
     environment:
       - "REDIS_HOST=redis"
-      - "MYSQL_DATABASE=${MYSQL_DATABASE}"
-      - "MYSQL_USER=${MYSQL_USER}"
-      - "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
       - "MYSQL_HOST=mysql"
+      - "NEXTCLOUD_TRUSTED_DOMAINS=${WEB_HOST} ${WEB_HOST_ALIASES}"
     depends_on:
       - mysql
       - redis
@@ -31,20 +33,6 @@ services:
       - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
       - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
       - "traefik.frontend.redirect.permanent=true"
-
-  nextcloud_cron:
-    image: nextcloud:fpm-alpine
-    restart: always
-    volumes:
-      - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html/data
-      - config:/var/www/html/config
-      - apps:/var/www/html/apps
-    entrypoint: /cron.sh
-    networks:
-      - internal
-    depends_on:
-      - mysql
-      - redis
 
 volumes:
   config:

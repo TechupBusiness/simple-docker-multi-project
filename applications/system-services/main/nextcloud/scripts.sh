@@ -7,5 +7,5 @@ nextcloudInstructions() {
     WEB_HOST=$(configGetValueByFile WEB_HOST "$ENV_FILE")
 
     echo "NEXTCLOUD:"
-    echo "- Go to https://$WEB_HOST/ to start the installation process (after starting your project)"
+    echo "- Go to https://$WEB_HOST/ and log in with your admin credentials"
 }

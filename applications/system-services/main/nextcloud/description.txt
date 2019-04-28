@@ -1,1 +1,1 @@
-open source, self-hosted file share and communication platform like Dropbox, Google Drive, Box.com, etc. (required services: mysql, redis)
+open source, self-hosted file share and communication platform like Dropbox, Google Drive, Box.com, etc. (required services: mysql, redis, email)
