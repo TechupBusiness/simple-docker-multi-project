@@ -1,1 +1,1 @@
-Email postfix server to send out your emails.
+Email server to send out your emails.
