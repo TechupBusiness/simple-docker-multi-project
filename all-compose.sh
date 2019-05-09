@@ -4,6 +4,6 @@
 
 for project in applications/docker-data/*; do
     if [ -d "$project" ]; then
-        compose.sh $(basename "$project") "$@"
+        ./compose.sh $(basename "$project") "$@"
     fi
 done
