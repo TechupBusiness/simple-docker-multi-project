@@ -1,1 +1,1 @@
-MySQL Service via MariaDB
+Alternative mysql database

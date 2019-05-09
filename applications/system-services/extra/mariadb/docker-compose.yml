@@ -1,21 +1,20 @@
 version: '3.5'
 
 services:
-  mysql:
+  mariadb:
     image: mariadb
     restart: always
     volumes:
-      - db_vol:/var/lib/mysql
+      - mariadb_vol:/var/lib/mysql
     expose:
       - '3306'
     networks:
       - internal
     environment:
-      - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}"
-      - "MYSQL_DATABASE=${MYSQL_DATABASE}"
-      - "MYSQL_USER=${MYSQL_USER}"
-      - "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+      - "MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}"
+      - "MYSQL_DATABASE=${MARIADB_DATABASE}"
+      - "MYSQL_USER=${MARIADB_USER}"
+      - "MYSQL_PASSWORD=${MARIADB_PASSWORD}"
 
-# We keep db_vol for this volume for backward compatibility
 volumes:
-  db_vol:
+  mariadb_vol:
