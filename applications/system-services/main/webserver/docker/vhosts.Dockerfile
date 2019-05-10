@@ -11,5 +11,6 @@ RUN { \
     echo 'Require all granted'; \
     echo '</Directory>'; \
     echo '</VirtualHost>'; \
-	} > /etc/apache2/sites-available/host-${HOST}.conf
+	} > /etc/apache2/sites-available/host-${HOST}.conf && \
+	ln -s ../sites-available/host-${HOST}.conf /etc/apache2/sites-enabled/host-${HOST}.conf
 
