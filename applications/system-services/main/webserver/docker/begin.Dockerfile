@@ -5,6 +5,11 @@ FROM php:$PHP_VERSION
 ARG PHP_EXTENSIONS=""
 ARG APACHE_MODULES=""
 ARG APT_LIBS=""
+ARG UID="33"
+ARG GID="33"
+
+RUN usermod -u $UID www-data && \
+    groupmod -g $GID www-data
 
 RUN apt-get -y update \
     && apt-get install -y --no-install-recommends \
