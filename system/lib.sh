@@ -329,12 +329,31 @@ display_services() {
 # $3 OPTIONAL service-type "main" or "extra", default: "main extra"
 # return: echo "0" (not existing) or "1" (existing)
 has_service() {
+    SERVICE="$1"
     PROJECT="$2"
+    SERVICE_TYPE="$3"
 
-    if [ -z "$3" ]; then
+    SERVICE_PATH=$(getServicePath "$SERVICE" "$PROJECT" "$SERVICE_TYPE")
+
+    if [[ -z "$SERVICE_PATH" ]]; then
+        echo "0"
+    else
+        echo "1"
+    fi
+}
+
+# $1 REQUIRED service-id
+# $2 project
+# $3 OPTIONAL service-type "main" or "extra", default: "main extra"
+# return: echo path (existing) or nothing (not existing)
+getServicePath() {
+    SERVICE="$1"
+    PROJECT="$2"
+    if [[ -z "$3" ]]; then
         3="main extra";
     fi
     serviceTypes="$3"
+
     for serviceType in $serviceTypes; do
         for serviceLocation in system custom project; do
 
@@ -345,14 +364,13 @@ has_service() {
             fi
             for service in $location/*; do
                 serviceName=$(basename "$service")
-                if [[ "$serviceName" == "$1" ]]; then
-                    echo "1"
+                if [[ "$serviceName" == "$SERVICE" ]]; then
+                    echo "$location/$serviceName"
                     exit
                 fi
             done
         done
     done
-    echo "0"
 }
 
 # $1 Path
