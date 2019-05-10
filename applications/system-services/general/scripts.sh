@@ -33,9 +33,9 @@ generalBuild() {
     done
 
     if [[ -z "$WEB_HOST" ]]; then
-        configReplaceValue $ENV_FILE "PROXY_TMP_DISABLED" "false"
+        configReplaceValue $ENV_FILE "PROXY_TMP_ENABLED" "false"
     else
-        configReplaceValue $ENV_FILE "PROXY_TMP_DISABLED" "true"
+        configReplaceValue $ENV_FILE "PROXY_TMP_ENABLED" "true"
     fi
 
     WEB_PATHS=$(configGetValueByFile WEB_PATHS "$ENV_FILE")
