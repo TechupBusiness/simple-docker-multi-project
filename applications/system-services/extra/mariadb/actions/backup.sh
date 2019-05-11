@@ -2,7 +2,7 @@
 
 FILE_NAME="$1"
 
-DATE=$(date +"%d-%b-%Y")
+DATE=$(date +"%Y-%m-%d")
 if [[ -z $FILE_NAME ]]; then
     FILE_NAME="export-$DATE"
 fi
