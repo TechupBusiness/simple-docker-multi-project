@@ -20,6 +20,9 @@ if [ -f "$ENV_FILE" ]; then
     fi
     export LAMP_TMP_RUNNING="$PROJECT"
 
+    UID=$(configGetValueByFile UID "$ENV_FILE")
+    GID=$(configGetValueByFile GID "$ENV_FILE")
+
     # Check for modules installed
     MAIN_SERVICE=$(configGetValueByFile MAIN_SERVICE "$ENV_FILE")
     EXTRA_SERVICES=$(configGetValueByFile EXTRA_SERVICES "$ENV_FILE")
@@ -27,6 +30,12 @@ if [ -f "$ENV_FILE" ]; then
     if [[ "$HAS_MAIN_SERVICE" = "0" ]]; then
         echo "MAIN SERVICE \"$MAIN_SERVICE\" DOES NOT EXIST!"
         exit
+    else
+        mkdir -p "applications/logs/${PROJECT}/$MAIN_SERVICE"
+        $SUDO chown -R $UID:$GID "applications/logs/${PROJECT}/$MAIN_SERVICE"
+
+        mkdir -p "applications/instance-data/${PROJECT}"
+        $SUDO chown -R $UID:$GID "applications/instance-data/${PROJECT}"
     fi
     EXTRA_SERVICES=$(configGetValueByFile EXTRA_SERVICES "$ENV_FILE")
     for service in $EXTRA_SERVICES; do
@@ -34,6 +43,12 @@ if [ -f "$ENV_FILE" ]; then
         if [[ "$HAS_EXTRA_SERVICE" = "0" ]]; then
             echo "EXTRA SERVICE \"$service\" DOES NOT EXIST."
             exit
+        else
+            mkdir -p "applications/logs/${PROJECT}/$service"
+            $SUDO chown -R $UID:$GID "applications/logs/${PROJECT}/$service"
+
+            mkdir -p "applications/backups/${PROJECT}/$service"
+            $SUDO chown -R $UID:$GID "applications/backups/${PROJECT}/$service"
         fi
     done
 
