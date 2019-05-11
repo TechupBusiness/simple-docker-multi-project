@@ -7,7 +7,7 @@ services:
     volumes:
       - mariadb_vol:/var/lib/mysql
       - ../../backups/${PROJECT_NAME}/mariadb:/backups
-      - ./actions:/actions
+      - ../../system-services/extra/mariadb/actions:/actions
     expose:
       - '3306'
     networks:
