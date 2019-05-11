@@ -7,4 +7,4 @@ if [[ -z "$FILE_NAME" ]]; then
     exit
 fi
 
-bunzip2 < /backups/$FILE_NAME.sql.bz2 | mysql -uroot -p$$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE
+bunzip2 < /backups/$FILE_NAME.sql.bz2 | mysql -uroot -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE
