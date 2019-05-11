@@ -17,7 +17,7 @@ mariadbBackup() {
     PROJECT="$1"
     PROJECT_ENV="applications/docker-data/$PROJECT/.env"
 
-    BACKUP_PATH="applications/backups/$PROJECT"
+    BACKUP_PATH="applications/backups/$PROJECT/mariadb"
 
     FILE_NAME="$2"
 
@@ -36,7 +36,7 @@ mariadbRestore() {
     PROJECT="$1"
     PROJECT_ENV="applications/docker-data/$PROJECT/.env"
 
-    BACKUP_PATH="applications/backups/$PROJECT"
+    BACKUP_PATH="applications/backups/$PROJECT/mariadb"
 
     FILE_NAME="$2"
 
@@ -50,7 +50,7 @@ mariadbBackupList() {
     PROJECT="$1"
     PROJECT_ENV="applications/docker-data/$PROJECT/.env"
 
-    BACKUP_PATH="applications/backups/$PROJECT"
+    BACKUP_PATH="applications/backups/$PROJECT/mariadb"
 
     for i in $BACKUP_PATH/*.sql.bz2; do
         [ -f "$i" ] || break
