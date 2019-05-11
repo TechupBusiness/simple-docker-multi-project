@@ -84,12 +84,17 @@ editEnvInteractiveVariableExecution() {
         echo "$title"
 
         read -p "           Username: " USER
-        read -p "           Password: " PW
 
-        if [ ! -z "$USER" ] && [ ! -z "$PW" ]; then
-            NEW_VALUE=$(generate_basic_auth "env" "$USER" "$PW")
-            if [[ -z $NEW_VALUE ]]; then
-                echo "OOPS... something went wrong. Maybe htpasswd is not present on your system. Please run install.sh to check your system."
+        if [[ ! -z "$USER" ]]; then
+            read -p "           Password: " PW
+
+            if [[ ! -z "$PW" ]]; then
+                NEW_VALUE=$(generate_basic_auth "env" "$USER" "$PW")
+                if [[ -z $NEW_VALUE ]]; then
+                    echo "OOPS... something went wrong. Maybe htpasswd is not present on your system. Please run install.sh to check your system."
+                fi
+            else
+                NEW_VALUE=""
             fi
         else
             NEW_VALUE=""
