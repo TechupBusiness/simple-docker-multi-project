@@ -350,9 +350,10 @@ getServicePath() {
     SERVICE="$1"
     PROJECT="$2"
     if [[ -z "$3" ]]; then
-        3="main extra";
+        serviceTypes="main extra"
+    else
+        serviceTypes="$3"
     fi
-    serviceTypes="$3"
 
     for serviceType in $serviceTypes; do
         for serviceLocation in system custom project; do
