@@ -39,4 +39,4 @@ if [[ -z $COMMAND ]] || [[ ! -f "$servicePath/actions/$COMMAND.sh" ]]; then
     exit
 fi
 
-./compose.sh "$PROJECT" exec "$SERVICE" "./actions/$COMMAND.sh $@"
+./compose.sh "$PROJECT" exec "$SERVICE" /bin/bash /actions/$COMMAND.sh $@
