@@ -12,7 +12,7 @@ if (( $EUID != 0 )); then SUDO='sudo'; fi
 
 SERVICE="$1"
 COMMAND="$2"
-FILE_NAME="$3"
+shift; shift;
 
 SERVICE_TYPE=""
 
@@ -27,28 +27,16 @@ else
     fi
 fi
 
-if [[ -z $COMMAND ]] || ([[ ! $COMMAND = "list-backups" ]] && [[ ! $COMMAND = "backup" ]] && [[ ! $COMMAND = "restore" ]]); then
-    echo "Parameter 2 COMMAND ('list-backups', 'backup' or 'restore') is missing or wrong"
-    exit
-fi
-
 servicePath=$(getServicePath "$SERVICE" "$PROJECT")
-if [[ ! -f "$servicePath/scripts.sh" ]]; then
-    echo "Service '$SERVICE' does not contain any actions (scripts.sh does not exist)!"
+
+if [[ -z $COMMAND ]] || [[ ! -f "$servicePath/actions/$COMMAND.sh" ]]; then
+    echo "Parameter 2 COMMAND is missing or wrong. Available commands are: "
+    for i in $servicePath/actions/*.sh; do
+        [[ -f "$i" ]]|| break
+        actionName=$(basename "$i")
+        echo "- ${actionName%.*}"
+    done
     exit
 fi
 
-if [[ $COMMAND = "list-backups" ]]; then
-    runScript "$servicePath" "ListBackups" "$PROJECT" "$SERVICE"
-else
-    if [[ $COMMAND = "backup" ]]; then
-        runScript "$servicePath" "Backup" "$PROJECT" "$SERVICE" "$FILE_NAME"
-    elif [[ $COMMAND = "restore" ]]; then
-        if [[ -z $FILE_NAME ]]; then
-            echo "Parameter 3 FILE NAME is missing"
-            exit
-        else
-            runScript "$servicePath" "Restore" "$PROJECT" "$SERVICE" "$FILE_NAME"
-        fi
-    fi
-fi
+./compose.sh "$PROJECT" exec "$SERVICE" "./actions/$COMMAND.sh $@"

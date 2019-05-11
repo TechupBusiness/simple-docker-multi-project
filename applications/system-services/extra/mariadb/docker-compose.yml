@@ -6,6 +6,8 @@ services:
     restart: always
     volumes:
       - mariadb_vol:/var/lib/mysql
+      - ../../backups/${PROJECT_NAME}/mariadb:/backups
+      - ./actions:/actions
     expose:
       - '3306'
     networks:
