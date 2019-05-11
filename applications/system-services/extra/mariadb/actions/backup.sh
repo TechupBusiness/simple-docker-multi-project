@@ -8,3 +8,5 @@ if [[ -z $FILE_NAME ]]; then
 fi
 
 mysqldump --user=root --password=$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE | bzip2 > /backups/$FILE_NAME.sql.bz2
+
+chown $USER_ID:$GROUP_ID /backups/$FILE_NAME.sql.bz2

@@ -11,8 +11,8 @@ services:
         - "PHP_EXTENSIONS=${PHP_EXTENSIONS}"
         - "APACHE_MODULES=${APACHE_MODULES}"
         - "APT_LIBS=${APT_LIBS}"
-        - "UID=${UID}"
-        - "GID=${GID}"
+        - "UID=${USER_ID}"
+        - "GID=${GROUP_ID}"
     restart: always
     expose:
       - '80'

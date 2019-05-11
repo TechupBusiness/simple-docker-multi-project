@@ -17,6 +17,8 @@ services:
       - "MYSQL_DATABASE=${MARIADB_DATABASE}"
       - "MYSQL_USER=${MARIADB_USER}"
       - "MYSQL_PASSWORD=${MARIADB_PASSWORD}"
+      - "USER_ID=${USER_ID}"
+      - "GROUP_ID=${GROUP_ID}"
 
 volumes:
   mariadb_vol:
