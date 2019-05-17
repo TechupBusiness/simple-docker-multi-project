@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   ghost:
-    image: ghost:2-alpine
+    image: ghost:${GHOST_VERSION:-alpine}
     restart: always
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/lib/ghost/content

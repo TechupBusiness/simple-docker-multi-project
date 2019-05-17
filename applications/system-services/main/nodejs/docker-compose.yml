@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   nodejs:
-    image: node:${NODEJS_VERSION}
+    image: node:${NODEJS_VERSION:-latest}
     restart: always
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/app

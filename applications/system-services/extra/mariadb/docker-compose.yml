@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   mariadb:
-    image: mariadb
+    image: mariadb:${MARIADB_VERSION:-latest}
     restart: always
     volumes:
       - mariadb_vol:/var/lib/mysql

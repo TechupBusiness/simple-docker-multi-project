@@ -5,6 +5,8 @@ services:
     build:
       context: ../../system-services/main/nextcloud
       dockerfile: "Dockerfile"
+      args:
+        - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION}
     restart: always
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html/data

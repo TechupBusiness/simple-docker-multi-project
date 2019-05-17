@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin/phpmyadmin:${PMA_VERSION:-latest}
     restart: always
     networks:
       - proxy

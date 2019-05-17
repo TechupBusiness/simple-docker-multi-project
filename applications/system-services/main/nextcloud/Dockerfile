@@ -1,4 +1,6 @@
-FROM nextcloud:production-apache
+ARG NEXTCLOUD_VERSION=production-apache
+
+FROM nextcloud:$NEXTCLOUD_VERSION
 
 # Add email and cron (cronjob itself is written by original nextcloud image already, just the service is missing)
 RUN apt-get update && \
