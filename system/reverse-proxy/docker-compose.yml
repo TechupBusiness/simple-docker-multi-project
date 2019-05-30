@@ -3,11 +3,11 @@ services:
   traefik:
     container_name: traefik
     image: traefik:${TRAEFIK_VERSION:-alpine}
-    command: '--acme.email=${ADMIN_EMAIL}'
+    command: '--acme.email=${TRAEFIK_ADMIN_EMAIL}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik.toml:/traefik.toml
-      - ./acme.json:/acme.json
+      - ../configuration/acme.json:/acme.json
     restart: always
     networks:
       - traefik-proxy
@@ -15,9 +15,9 @@ services:
       - "80:80"
       - "443:443"
     labels:
-      - "traefik.frontend.rule=Host:${WEB_HOST}"
-      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
-      - "traefik.enable=${WEB_ENABLED-protection:login-disabled-if-empty-string}"
+      - "traefik.frontend.rule=Host:${TRAEFIK_WEB_HOST}"
+      - "traefik.frontend.auth.basic.users=${TRAEFIK_WEB_AUTH_BASIC}"
+      - "traefik.enable=${TRAEFIK_WEB_ENABLED}"
       - "traefik.port=8080"
 
 networks:

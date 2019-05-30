@@ -11,7 +11,7 @@ fi
 echo "Welcome! Checking/preparing environment..."
 
 #################
-# Checkinf for some applications
+# Checking for some applications
 #################
 echo "Search for docker..."
 command -v docker >/dev/null 2>&1 || {
@@ -45,7 +45,7 @@ command -v docker-compose >/dev/null 2>&1 || {
         COMPOSE_VERSION=`git ls-remote https://github.com/docker/compose | grep refs/tags | grep -oP "[0-9]+\.[0-9][0-9]+\.[0-9]+$" | tail -n 1`
         $SUDO sh -c "curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
         $SUDO chmod +x /usr/local/bin/docker-compose
-        $SUDO curl -L "https://github.com/docker/compose/releases/download/<VERSION>/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        #$SUDO curl -L "https://github.com/docker/compose/releases/download/<VERSION>/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
     else
         echo >&2 "Please install docker-compose manually (https://docs.docker.com/compose/install/) and try again to run ./install.sh"
@@ -76,28 +76,38 @@ for SCRIPT in *.sh; do
     fi
 done
 
-echo "Preparing reverse-proxy..."
+pathConfig="system/configuration"
 
-path="system/reverse-proxy"
-if [[ ! -f "$path/acme.json" ]]; then
-    cp "$path/acme-template.json" "$path/acme.json"
+echo "Preparing reverse-proxy..."
+pathProxy="system/reverse-proxy"
+if [[ ! -f "$pathConfig/acme.json" ]]; then
+    cp "$pathProxy/acme-template.json" "$pathConfig/acme.json"
     echo "Created acme.json."
 else
     echo "OK - acme.json already existing."
 fi
 
-if [[ -f "$path/acme.json" ]] && [[ $(stat --format '%a' "$path/acme.json") != "600" ]]; then
-    chmod 600 "$path/acme.json"
+if [[ -f "$pathConfig/acme.json" ]] && [[ $(stat --format '%a' "$pathConfig/acme.json") != "600" ]]; then
+    chmod 600 "$pathConfig/acme.json"
     echo "Set permission of acme.json to 600."
 fi
+editEnv "$pathProxy/template.env" "$pathConfig/.env" "interactive" "reverseproxy"
 
-editEnv "$path/template.env" "$path/.env" "interactive" "reverseproxy"
+
+echo "Preparing backup scheduler..."
+pathBackup="system/backup"
+editEnv "$pathBackup/template.env" "$pathConfig/.env" "interactive" "backup"
+
+
+cd "$pathConfig"
 
 echo "Starting reverse-proxy..."
+$SUDO docker-compose -p "reverse-proxy" -f "../../$pathProxy/docker-compose.yml" stop
+$SUDO docker-compose -p "reverse-proxy" -f "../../$pathProxy/docker-compose.yml" up -d
 
-cd "$path"
-$SUDO docker-compose stop
-$SUDO docker-compose up -d
+echo "Starting backup scheduler..."
+$SUDO docker-compose -p "backup" -f "../../$pathBackup/docker-compose.yml" stop
+$SUDO docker-compose -p "backup" -f "../../$pathBackup/docker-compose.yml" up -d
 
 echo "
 

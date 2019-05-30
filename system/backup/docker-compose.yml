@@ -1,0 +1,15 @@
+version: '3.5'
+services:
+  restic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - RESTIC_PASSWORD=${BACKUP_RESTIC_PASSWORD}
+    env_file:
+      - ../configuration/.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../../:/docker-projects:ro
+    entrypoint: tail -f /dev/null
