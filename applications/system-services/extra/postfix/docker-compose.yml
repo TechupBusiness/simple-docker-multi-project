@@ -3,6 +3,8 @@ version: '3.5'
 services:
   postfix:
     image: boky/postfix
+    volumes:
+      - ../../docker-data/${PROJECT_NAME}/services/extra/postfix/keys:/etc/opendkim/keys
     expose:
       - "587"
     networks:
