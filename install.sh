@@ -52,6 +52,13 @@ command -v docker-compose >/dev/null 2>&1 || {
         exit 1
     fi
 }
+
+if [[ ! -f /etc/bash_completion.d/docker-compose ]]; then
+    COMPOSE_VERSION=$(docker-compose --version | grep -oP "[0-9]+\.[0-9][0-9]+\.[0-9]+")
+    $SUDO sh -c "curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose"
+fi
+
+
 echo "Done"
 
 echo "Looking for htpasswd..."
