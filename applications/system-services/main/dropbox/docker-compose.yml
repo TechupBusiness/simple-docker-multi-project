@@ -5,14 +5,17 @@ services:
     build:
       context: ../../system-services/main/dropbox
       dockerfile: "Dockerfile"
+      args:
+        - DROPBOX_LOCALE=${DROPBOX_LOCALE}
+        - UID=${USER_ID}
+        - GID=${GROUP_ID}
     restart: always
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/home/dropbox/Dropbox
       - dropbox_data:/home/dropbox/.dropbox
-      - dropbox_dist:/home/dropbox/.dropbox-dist
     networks:
       - internal
+    #entrypoint: tail -f /dev/null
 
 volumes:
   dropbox_data:
-  dropbox_dist:
