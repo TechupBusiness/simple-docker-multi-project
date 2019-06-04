@@ -19,6 +19,11 @@ services:
       - "MYSQL_PASSWORD=${MARIADB_PASSWORD}"
       - "USER_ID=${USER_ID}"
       - "GROUP_ID=${GROUP_ID}"
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=${MARIADB_ROOT_PASSWORD} --execute \"SHOW DATABASES;\""
+      interval: 5s
+      timeout: 20s
+      retries: 10
 
 volumes:
   mariadb_vol:
