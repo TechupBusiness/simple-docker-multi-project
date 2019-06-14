@@ -1,0 +1,1 @@
+Client and relay server for modern and fast file synchronization P2P written in Go (like Dropbox but opensource and without central server) Relay server for P2P syncthing client (allows data transfer between syncthing clients wihout the need to forward ports)

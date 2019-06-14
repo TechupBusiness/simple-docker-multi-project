@@ -1,1 +1,0 @@
-Relay server for P2P syncthing client (allows data transfer between syncthing clients wihout the need to forward ports)

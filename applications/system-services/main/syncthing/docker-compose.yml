@@ -1,0 +1,39 @@
+version: '3.5'
+
+services:
+  syncthing-relay:
+    build:
+      context: ../../system-services/main/syncthing
+      dockerfile: "Dockerfile"
+    restart: always
+    volumes:
+      - keys:/root
+    networks:
+      - internal
+    ports:
+      - ${SYNCTHING_RELAY_PORT}:${SYNCTHING_RELAY_PORT}
+    entrypoint: ["/bin/entrypoint.sh", "-pools=", "-status-srv=", "-listen=:${SYNCTHING_RELAY_PORT}", "-keys=/root"]
+
+  syncthing-client:
+    image: syncthing/syncthing
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/syncthing
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+    command: ["-gui-address=0.0.0.0:8384"]
+    networks:
+      - proxy
+      - internal
+    labels:
+      - "traefik.enable=${PROXY_TMP_ENABLED}"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.port=8384"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
+
+volumes:
+  keys:
