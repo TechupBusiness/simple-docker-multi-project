@@ -2,6 +2,12 @@ ARG NEXTCLOUD_VERSION=production-apache
 
 FROM nextcloud:$NEXTCLOUD_VERSION
 
+ARG USER_ID=33
+ARG GROUP_ID=33
+
+RUN usermod -u ${USER_ID} www-data && \
+    groupmod -g ${GROUP_ID} www-data
+
 # Add email and cron (cronjob itself is written by original nextcloud image already, just the service is missing)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \

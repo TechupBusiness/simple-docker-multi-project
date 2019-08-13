@@ -7,6 +7,8 @@ services:
       dockerfile: "Dockerfile"
       args:
         - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION}
+        - USER_ID=${USER_ID}
+        - GROUP_ID=${GROUP_ID}
     restart: always
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html/data
