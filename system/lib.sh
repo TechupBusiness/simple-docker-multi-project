@@ -466,7 +466,7 @@ getDockerComposeYamls() {
     returnVar=""
     for serviceLocation in $locations; do
         if [[ "$serviceLocation" == "project" ]]; then
-            location="docker-data/$PROJECT/services/$serviceType/$serviceName"
+            location="docker-data/$PROJECT"
         else
             location="$serviceLocation-services/$serviceType/$serviceName"
         fi
