@@ -20,10 +20,10 @@ services:
       - ../../docker-data/${PROJECT_NAME}/.env
     environment:
       - "REDIS_HOST=redis"
-      - "MYSQL_HOST=mysql"
+      - "MYSQL_HOST=mariadb"
       - "NEXTCLOUD_TRUSTED_DOMAINS=${WEB_HOST} ${WEB_HOST_ALIASES}"
     depends_on:
-      - mysql
+      - mariadb
       - redis
     networks:
       - proxy
