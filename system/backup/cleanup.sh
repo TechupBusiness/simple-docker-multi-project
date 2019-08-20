@@ -1,6 +1,8 @@
 #!/bin/bash
-
 # runs weekly at 3am on sunday
+
+# Outputs date to log
+date
 
 # Repo params
 O_PARAM=""

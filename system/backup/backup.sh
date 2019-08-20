@@ -1,6 +1,8 @@
 #!/bin/bash
-
 # runs daily at 2am
+
+# Outputs date to log
+date
 
 # Variables
 PROJECT_FOLDER_PARENTS="applications/backups applications/cronjobs applications/docker-data applications/instance-data applications/logs"
