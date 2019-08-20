@@ -30,6 +30,49 @@ please see [here](#under-the-hood---services-in-the-spot-light) for details on e
 **NOTE:** Even though there are bash-scripts and many folder, the architecture is simple and straight forward. There are just a few conventions you need
 to be aware of, if you want to add or modify services.
 
+**Table of contents**
+* [What is this project actually doing for real?](#what-is-this-project-actually-doing-for-real)
+* [Shipped easy-to-use services](#shipped-easy-to-use-services)
+* [Under the hood - services in the spot-light](#under-the-hood---services-in-the-spot-light)
+  * [System service](#system-service)
+    * [traefik - reverse-proxy](#traefik---reverse-proxy)
+      * [Using the same domain for multiple projects (SEO)](#using-the-same-domain-for-multiple-projects-seo)
+    * [restic - backup solution](#restic---backup-solution)
+  * [Main services](#main-services)
+    * [webserver (apache+php)](#webserver-apachephp)
+      * [Storing web data files](#storing-web-data-files)
+      * [Adding new modules/libraries](#adding-new-moduleslibraries)
+      * [Multiple domains on one webserver](#Multiple domains on one webserver)
+      * [Troubleshooting](#troubleshooting)
+    * [Ghost](#ghost)
+    * [Dropbox](#dropbox)
+    * [NextCloud](#nextcloud)
+    * [Syncthing](#syncthing)
+  * [Extra services](#extra-services)
+    * [MariaDB (MySQL)](#mariadb-mysql)
+      * [Import sql-file backup](#import-sql-file-backup)
+      * [Export sql-file](#export-sql-file)
+    * [Redis](#redis)
+    * [PostgreSQL](#postgresql)
+    * [pgAdmin](#pgadmin)
+    * [Email (Postfix server)](#email-postfix-server)
+    * [(Cron)jobs](#cronjobs)
+    * [PhpMyAdmin](#phpmyadmin)
+  * [Scripts](#scripts)
+    * [compose.sh](#composesh)
+    * [project.sh](#projectsh)
+  * [Custom services and service modifications](#custom-services-and-service-modifications)
+    * [Architecture](#architecture)
+    * [Service structure](#service-structure)
+      * [docker-compose.yml](#docker-composeyml)
+        * [docker-compose for a specific project](#docker-compose-for-a-specific-project)
+      * [scripts.sh](#scriptssh)
+      * [template.env](#templateenv)
+    * [Extending existing services](#extending-existing-services)
+  * [Troubleshooting](#troubleshooting)
+  * [Host requirements](#host-requirements)
+
+
 ## What is this project actually doing for real?
 1. It is only using existing standard functionality of docker (container software) and docker-compose (=YAML file format processor to run docker container)
 1. It ships a set of useful docker-compose files (=predefined configurable services)
@@ -210,18 +253,6 @@ Extra services are additional services supporting the main service like database
 This service is using mariaDB as database. For 99.9% of the use-cases this should be a good replacement for mysql. See [here](https://hackr.io/blog/mariadb-vs-mysql) for details.
 [See project website for more information](https://mariadb.org/).
 
-#### Redis
-This service is a fast (temporary) string cache to improve performance of (web) applications.
-[See project website for more information](https://redis.io).
-
-#### PostgreSQL
-A very feature-rich and professional open-source database.
-[See project website for more information](https://www.postgresql.org/).
-
-#### pgAdmin
-Web-based administration interface for PostgreSQL.
-[See project website for more information](https://www.pgadmin.org/).
-
 ##### Import sql-file backup
 The fastest solution (performance and manual steps) is to import it via shell. After starting the `mysql` service (`sudo ./compose.sh {PROJECT} up -d mysql`), 
 it's only one command-line (execution context should be the main folder, where most *.sh files are):
@@ -234,6 +265,18 @@ An alternative is the service `phpmyadmin`, which can be added to the project. I
 ```bash
 ./compose.sh {PROJECT} exec mariadb /usr/bin/mysqldump --user=root --password={MYSQL_ROOT_PASSWORD} {DATABASE_NAME} > {PATH_TO}/database-export.sql
 ```
+
+#### Redis
+This service is a fast (temporary) string cache to improve performance of (web) applications.
+[See project website for more information](https://redis.io).
+
+#### PostgreSQL
+A very feature-rich and professional open-source database.
+[See project website for more information](https://www.postgresql.org/).
+
+#### pgAdmin
+Web-based administration interface for PostgreSQL.
+[See project website for more information](https://www.pgadmin.org/).
 
 #### Email (Postfix server)
 To send emails, every application needs a service for this kind of work. This services sends emails directly, by using postfix. 
@@ -336,7 +379,7 @@ Each service should have at least the following default files:
 - **[template.env](#templateenv)**: Contains all variables, that are needed to configure the service
 - **actions/....sh**: Folder which contains actions (=bash scripts) that a service can offer (e.g. creating backups, restoring - implemented in service [mariadb](#mariadb-mysql) so far)
 
-### docker-compose.yml
+#### docker-compose.yml
 **IMPORTANT:** the directory context for all path specifications is `applications/docker-data/MY-PROJECT`. To access folders like `instance-data` or `logs` or sub-folders of the service, you need to go two folder-levels up first:
 ```
 ../../instance-data
@@ -358,7 +401,7 @@ All "main" services must implement the following labels, to work properly with t
 ```
 NOTE: Specification of multiple redirects may come in traefik 2.0
 
-#### docker-compose for a specific project
+##### docker-compose for a specific project
 In some cases you may want to add specific services or mountpoints to one project. To do this simply create a new `docker-compose.yml` in your `applications/docker-data/MY-PROJECT` directory.
 
 **Example:**   
@@ -379,7 +422,7 @@ services:
 
 Then you can add Dropbox and Syncthing as external storages in Nextcloud easily (`/data_dropbox` and `/data_syncthing`). Please make sure the projects are all using the same owner uid, otherwise linux user restrictions may apply!
 
-### scripts.sh
+#### scripts.sh
 It can contain the following methods, which are triggered (replace "{service}" with the name of your service = folder name of the service):
 
 - **{service}Setup**: This method will be called when the user finished configuration via `./project.sh`
@@ -442,7 +485,7 @@ webserverFieldDescriptions() {
 }
 ```
 
-### template.env
+#### template.env
 
 The env files need to follow exactly this structure, so it can be made interactive:
 
