@@ -4,8 +4,9 @@ RUN apk add --update --no-cache ca-certificates fuse openssh-client curl bzip2 b
 
 VOLUME /root
 
-COPY backup.sh /etc/periodic/daily/backup.sh
-COPY cleanup.sh /etc/periodic/weekly/cleanup.sh
+# Note: "run-parts" command in crontab does not support *.sh extension
+COPY backup.sh /etc/periodic/daily/backup
+COPY cleanup.sh /etc/periodic/weekly/cleanup
 
 # Download & install rclone and restic
 RUN     cd /root && \
@@ -26,8 +27,8 @@ RUN     cd /root && \
         mv restic_* /usr/bin/restic && \
         chmod 755 /usr/bin/restic && \
         # Add cronjobs
-        chmod +x /etc/periodic/weekly/cleanup.sh && \
-        chmod +x /etc/periodic/daily/backup.sh && \
+        chmod +x /etc/periodic/weekly/cleanup && \
+        chmod +x /etc/periodic/daily/backup && \
         # Add ssh config (see https://restic.readthedocs.io/en/latest/030_preparing_a_new_repo.html#sftp )
         mkdir -p /root/.ssh && \
         touch /root/.ssh/config && \
