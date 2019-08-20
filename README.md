@@ -19,13 +19,13 @@ git clone https://github.com/TechupBusiness/simple-docker-multi-project.git && c
 This will help to setup the most basic settings. Behind the scenes it's creating an `.env` file, based on the user input, for the 
 containerized reverse-proxy before starting it.
 
-To add the first project:
+To add the first project type:
 ```
 ./project.sh
 ```
 This will guide through the creation of a new project. Behind the scenes it will simply bake together a `.env` file. 
 Depending on the service it may do some additional work (e.g. generating a Dockerfile or creating needed folders for content and backups, 
-please see the chapter "Under the hood - services in the spot-light" for details on each service).
+please see [here](#under-the-hood---services-in-the-spot-light) for details on each service).
 
 **NOTE:** Even though there are bash-scripts and many folder, the architecture is simple and straight forward. There are just a few conventions you need
 to be aware of, if you want to add or modify services.
@@ -45,20 +45,23 @@ Services are separated into two categories: "main" and "extra". Main services ar
 Extra services supports the main service of a project (e.g. a database or email service).
 
 - System (core)
-  - traefik: reverse proxy to route incoming http/https traffic for multiple domains to your containerized services/applications
+  - [traefik](#traefik---reverse-proxy): reverse proxy to route incoming http/https traffic for multiple domains to your containerized services/applications
+  - [restic](#restic---backup-solution): efficient opensource backup solution written in Go. Creates backups of all data within this project
 - Main
-  - webserver (apache+PHP): generic for all php applications out there
-  - ghost: publishing application on nodeJS, alternative to wordpress etc.)
-  - nextcloud: open source, self-hosted file share and communication platform (like Dropbox, Google Drive, Box.com, ...)
-  - nodejs: generic for all node.js applications
+  - [webserver](#webserver-apachephp): flexible apache webserver for php applications
+  - [dropbox](#dropbox): File share cloud provider
+  - [ghost](#ghost): publishing application on nodeJS, alternative to wordpress etc.)
+  - [nextcloud](#nextcloud): open source, self-hosted file share and communication platform (like Dropbox, Google Drive, Box.com, ...)
+  - [nodejs](#nodejs): generic for all node.js applications
+  - [syncthing](#syncthing): efficient open source P2P synchronization (Dropbox replacement)
 - Extra
-  - email: Postfix server to send emails
-  - jobs: Cronjobs, includes a backup for database (mariaDB)
-  - mysql: MariaDB database
-  - phpmyadmin: Control panel for mysql/mariaDB
-  - redis: String cache
-  - postgresql: PostgreSQL database
-  - pgadmin: PostgreSQL database admin panel
+  - [email](#email-postfix-server): Postfix server to send emails
+  - [jobs](#cronjobs): Cronjobs, includes a backup for database (mariaDB)
+  - [mariadb](#mariadb-mysql): Alternative mysql database
+  - [phpmyadmin](#phpmyadmin): Control panel for mysql/mariaDB
+  - [redis](#redis): String cache
+  - [postgresql](#postgresql): PostgreSQL database
+  - [pgadmin](#pgadmin): PostgreSQL database admin panel
 
 ## Under the hood - services in the spot-light
 All services have a file `template.env` which contains all available configuration options (including descriptions). Running `./project.sh {PROJECT}` allows to interactively (re)configure these settings
@@ -72,11 +75,12 @@ p2.local 127.0.0.1
 For the service `webserver` you may want to add some custom php.ini settings and enable PHP debugging with the module `xdebug`.
 
 ### System service
-#### reverse-proxy (traefik)
+#### traefik - reverse-proxy
 - It creates only SSL routes (redirects non-http to https) and generates all needed certificates automatically. This means full HTTPS without doing anything.
 - Offers a web-dashboard to check routes and backends (protected; behind basic authentication)
 - New routes for applications (=orchestrated services) are added completely automatically; you only need to set the server's IP for your domain(s) in your DNS.
 - No need to configure it manually
+- [See project website for more information](https://traefik.io)
 
 ![See this traefik architecture image](https://docs.traefik.io/img/architecture.png)
 
@@ -104,11 +108,19 @@ mydomain.com/info -> Project 2
 mydomain.com/categories/food -> Project 1
 ```
 
+#### restic - backup solution
+- One of the most efficient and up-to-date backup solution written in Go
+- Has built-in de-duplication and uses block-transfer for data
+- Create backups of all user-data added to this project
+- Daily backups at 2am
+- Configurable policy for backup periods
+- [See project website for more information](https://restic.net/)
+
 ### Main services
 Main services are THE main service of a project. They are the reason why someone would want to create a project with this architecture.
 
-#### webserver (Generic PHP, using Apache)
-This service allows to run ANY kind of PHP based web-application in nearly all PHP versions (good for legacy applications).
+#### webserver (apache+php)
+This service uses apache and allows to run ANY kind of PHP based web-application in nearly all PHP versions (good for legacy applications).
 It is creating a generated Dockerfile based on the project `.env` settings. 
 
 It is using the docker container `php:{PHP_VERSION}-apache` (PHP version can be configured). Please check [their documentation](https://hub.docker.com/_/php) for more information.
@@ -168,14 +180,47 @@ are strongly coupled (relevant settings for this scenario are `WEB_HOST_ALIASES`
 Downside for this solution is a less independent architecture of projects and security concerns. Because an attacker, which breaks into one website (e.g. old wordpress) can easily 
 get access to other websites in the same project-instance.
 
-#### Application Ghost (publishing platform on nodeJS)
+##### Troubleshooting
+###### Infinite redirect loops
+Some applications like wordpress create infinite redirect loops because they redirect to HTTP. This happens because the webserver is serving it's content without SSL to the reverse proxy, 
+so the application often don't know that they are actually served via HTTPS. The reverse-proxy is then redirecting the HTTP request back to HTTPS and the redirect-game starts again (infinite).
+Please see in the docs of your PHP application how to avoid this situation. For wordpress [see here](https://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy).
+
+#### Ghost
 Ghost is a publishing platform on nodeJS. See [their website](https://ghost.org/) for more information.
+
+#### Dropbox
+The dropbox service allows to sync the data to a private server. See [their website](https://dropbox.com/) for more information about the payed service.
+
+#### NextCloud
+NextCloud is like other data "cloud" service, similar to Dropbox, but hosted on a private environment (and therefore no cloud for this project).
+It allows to share files with anyone, web-access and offers a proper mobile app, to access data on the go.
+In case you are not satisfies with the sync mechanism, you can integrate it with the syncthing services to have the best features of both worlds.
+Please see this [example](#docker-compose-for-a-specific-project). See [project website for more information](https://nextcloud.com/).
+
+#### Syncthing
+It is a very efficient P2P data synchronization application on folder level. 
+To avoid requiring port forwarding for clients, this project includes the relay server in addition to a client (as server copy of all complete data).
+[See project website for more information](https://syncthing.net/).
 
 ### Extra services
 Extra services are additional services supporting the main service like databases, caches, ...
 
-#### MySQL (MariaDB)
+#### MariaDB (MySQL)
 This service is using mariaDB as database. For 99.9% of the use-cases this should be a good replacement for mysql. See [here](https://hackr.io/blog/mariadb-vs-mysql) for details.
+[See project website for more information](https://mariadb.org/).
+
+#### Redis
+This service is a fast (temporary) string cache to improve performance of (web) applications.
+[See project website for more information](https://redis.io).
+
+#### PostgreSQL
+A very feature-rich and professional open-source database.
+[See project website for more information](https://www.postgresql.org/).
+
+#### pgAdmin
+Web-based administration interface for PostgreSQL.
+[See project website for more information](https://www.pgadmin.org/).
 
 ##### Import sql-file backup
 The fastest solution (performance and manual steps) is to import it via shell. After starting the `mysql` service (`sudo ./compose.sh {PROJECT} up -d mysql`), 
@@ -185,6 +230,11 @@ cat {PATH_TO}/database.sql | sudo docker exec -i $(sudo ./compose.sh {PROJECT} p
 ```
 An alternative is the service `phpmyadmin`, which can be added to the project. It allows to maintain the database via web-interface, including the import of SQL files.
 
+##### Export sql-file
+```bash
+./compose.sh {PROJECT} exec mariadb /usr/bin/mysqldump --user=root --password={MYSQL_ROOT_PASSWORD} {DATABASE_NAME} > {PATH_TO}/database-export.sql
+```
+
 #### Email (Postfix server)
 To send emails, every application needs a service for this kind of work. This services sends emails directly, by using postfix. 
 To avoid being labeled as spam, it's important to maintain at least a proper SPF entry on all used domains for the host-server ip.
@@ -192,17 +242,19 @@ Ideally the applications, which are sending emails, sign all emails with DKIM. T
 To setup DKIM on email service level instead, please see [here, how to add it or relay mails to another mail-service](https://github.com/bokysan/docker-postfix).
 
 #### (Cron)jobs
-The jobs services, allows to execute scripts periodically. By default it includes a script which backs up the mysql service database (if used) once per night. 
+The (cron) jobs service, allows to execute scripts periodically. By default it includes a script which backs up the mysql service database (if used) once per night. 
 The only configuration option so far is, how many days the database logs should be kept.
 
 #### PHPMyAdmin
 PHPMyAdmin is a web-administration-interface for mysql compatible databases.
+[See project website for more information](https://www.phpmyadmin.net/).
 
 ## Scripts
-* `compose.sh {PROJECT} {COMMAND}`: Controls (e.g. starts and stops) the project application (see "compose.sh commands" below for more information)
+* `compose.sh {PROJECT} {COMMAND}`: Controls (e.g. starts and stops) the project application (see [compose.sh commands](#composesh) below for more information)
 * `all-compose.sh {COMMAND}`: Run `./compose.sh {PROJECT} {COMMAND}` for all existing projects (that are having `STATUS=enabled` in their `.env` file)
 * `install.sh`: Checks the current environment, allows to install needed applications and setup the system services. You can run it as often as you want without damaging anything.
 * `project.sh {PROJECT}`: Adds new and edit existing projects. Interactive script to create a projects' `.env` file.
+* `service-action.sh`: Executes predefined actions in some services (e.g. backup&restore functionality) in service mariadb
 
 All scripts are tested with Ubuntu Linux.
 
@@ -211,7 +263,7 @@ set before (if existing project). The value which will be set is always shown: `
 To clear an existing value, `""` will do the job. Required settings (having three exclamation marks `!!!`) can't be skipped, unless there is a default value.
 
 ### compose.sh
-This script is an important wrapper for executing docker-compose, which constructs the docker-compose command for a specified project and triggers build code for each used service, if available (see chapter "Creating your own services" for more information). 
+This script is an important wrapper for executing docker-compose, which constructs the docker-compose command for a specified project and triggers build code for each used service, if available (see [Service structure](#service-structure) for more information). 
 Example call: 
 
 ```
@@ -231,6 +283,8 @@ Please see [docker-compose docs](https://docs.docker.com/compose/reference/overv
 ### project.sh
 This script generates the project folder in `applications/docker-data/{MY-PROJECT}` and reads all `template.env` settings from all chosen services. 
 It allows to interactively modify all settings in the projects' `.env` file. It can be run for new but also existing projects.
+
+It's possible to exit the interactive configuration any time by pressing `CTRL + C`. Variable values are written to the `.env` file in the moment you press the return key (after entering it). 
 
 ## Custom services and service modifications
 Custom services can be added in `applications/custom-services/` as `main`- or `extra`-service. You can add the content of `applications/custom-services/` to your own git repository and/or 
@@ -273,13 +327,14 @@ Services can be located in:
 
 This list also represents the order, in which the default files of a services are loaded. This way you can simply extend existing
 services and configuration in a server-specific (global) and project-specific context. 
-Please see chapter "Extending existing services" for more information.
+Please see [Extending existing services](#extending-existing-services) for more information.
 
 Each service should have at least the following default files:
 - **description.txt**: Short description of the service
-- **docker-compose.yml**: Regular docker compose file
-- **scripts.sh**: Script file with specific "interface" (possible functions according to a naming schema - see next chapter for more details)
-- **template.env**: Contains all variables, that are needed to configure the service
+- **[docker-compose.yml](#docker-composeyml)**: Regular docker compose file
+- **[scripts.sh](#scriptssh)**: Script file with specific "interface" (possible functions according to a naming schema)
+- **[template.env](#templateenv)**: Contains all variables, that are needed to configure the service
+- **actions/....sh**: Folder which contains actions (=bash scripts) that a service can offer (e.g. creating backups, restoring - implemented in service [mariadb](#mariadb-mysql) so far)
 
 ### docker-compose.yml
 **IMPORTANT:** the directory context for all path specifications is `applications/docker-data/MY-PROJECT`. To access folders like `instance-data` or `logs` or sub-folders of the service, you need to go two folder-levels up first:
@@ -302,6 +357,27 @@ All "main" services must implement the following labels, to work properly with t
       - "traefik.frontend.redirect.permanent=true"
 ```
 NOTE: Specification of multiple redirects may come in traefik 2.0
+
+#### docker-compose for a specific project
+In some cases you may want to add specific services or mountpoints to one project. To do this simply create a new `docker-compose.yml` in your `applications/docker-data/MY-PROJECT` directory.
+
+**Example:**   
+You are using Syncthing for your personal data synchronization but want it to be available via Nextcloud (for sharing, web- and mobile access). In addition you have your Dropbox folder, for legacy reasons.
+
+Example requirement: the project name of your syncthing instance is `syncthing`, Dropbox `dropbox` and Nextcloud `nextcloud`.
+
+Place in `applications/docker-data/nextcloud` the following `docker-compose.yml`:
+```yaml
+version: '3.5'
+
+services:
+  nextcloud:
+    volumes:
+      - ../../instance-data/dropbox:/data_dropbox
+      - ../../instance-data/syncthing:/data_syncthing
+```
+
+Then you can add Dropbox and Syncthing as external storages in Nextcloud easily (`/data_dropbox` and `/data_syncthing`). Please make sure the projects are all using the same owner uid, otherwise linux user restrictions may apply!
 
 ### scripts.sh
 It can contain the following methods, which are triggered (replace "{service}" with the name of your service = folder name of the service):
@@ -382,10 +458,10 @@ Tags with a special functionality:
 - `[HIDDEN]`: Will not show up when editing the settings interactively (via `./project.sh`) - used in service `webserver` (they are set in `scripts.sh -> webserverBuild()`)
 - `[REQUIRED]`: Fields with this tag needs a value (either provided as default value in `template.env`, newly entered by the user or already set when updating an existing project `.env` file)
 - `[BASIC-AUTH]`: If this is set, the user can enter a username and password which will be automatically encrypted to a proper basic-authentication string which traefik supports to protect applications.
-- `[SCRIPT]`: Please see the previous chapter "scripts.sh", how these placeholder will be replaced. 
+- `[SCRIPT]`: Please see the previous chapter [scripts.sh](#scriptssh), how these placeholder will be replaced. 
 
 ### Extending existing services
-For each service, the data is loaded in the following order (see "Service structure" for full paths):
+For each service, the data is loaded in the following order (see [Service structure](#service-structure) for full paths):
 1. system-services folder
 2. custom-services folder
 3. project-services folder
@@ -402,7 +478,7 @@ This way you are very flexible in modifying an existing service. You can change 
 ### How can I add my files to the webserver or other services?
 Maybe you are used to FTP, to transfer files. I would suggest to use SFTP (the ssh file transfer) - not to confuse with FTPS (FTP via SSL) instead.
 Or if possible, use git, wget, composer etc. on the command line to download the files you need.
-In case you really need it, you could add a custom-service with an FTP, linked to your data. Please see chapter `Creating your own services`.
+In case you really need it, you could add a custom-service with an FTP, linked to your data. Please see chapter [Custom services and service modifications](#custom-services-and-service-modifications).
 
 ### Browser says: Connection is not secure
 If this does not disappear automatically, it means that it could not sucessfully acquire a Let's encrypt SSL certificate.
@@ -425,3 +501,10 @@ Add a custom "extra" service to the project and create a file `template.env`. Pl
 All variables that you add in this file can be edited when you call `./project.sh MY-PROJECT`.
 2. The not recommended approach (will **not** allow configuration via `project.sh`):   
 Add the variables manually to the projects' `.env` file in `applications/docker-data/MY-PROJECT/.env`.
+
+### How can I add custom mount-points to a project?
+This can be done easily. Please see this [example](#docker-compose-for-a-specific-project).
+
+## Host requirements
+* 64bit processor
+* bash shell
