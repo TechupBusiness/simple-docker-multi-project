@@ -42,7 +42,7 @@ to be aware of, if you want to add or modify services.
     * [webserver (apache+php)](#webserver-apachephp)
       * [Storing web data files](#storing-web-data-files)
       * [Adding new modules/libraries](#adding-new-moduleslibraries)
-      * [Multiple domains on one webserver](#Multiple domains on one webserver)
+      * [Multiple domains on one webserver](#multiple-domains-on-one-webserver)
       * [Troubleshooting](#troubleshooting)
     * [Ghost](#ghost)
     * [Dropbox](#dropbox)
