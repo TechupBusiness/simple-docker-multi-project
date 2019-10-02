@@ -18,4 +18,7 @@ FROM syncthing/syncthing
 COPY --from=builder /src/strelaysrv /bin/strelaysrv
 COPY ./docker-entrypoint.sh /bin/entrypoint.sh
 
-ENTRYPOINT ["/bin/entrypoint.sh", "-pools=", "-status-srv="]
+HEALTHCHECK --interval=1m --timeout=10s \
+  CMD nc -z 127.0.0.1 22070 || exit 1
+
+ENTRYPOINT ["/bin/entrypoint.sh", "-pools="]

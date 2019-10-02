@@ -12,7 +12,7 @@ services:
       - internal
     ports:
       - ${SYNCTHING_RELAY_PORT}:${SYNCTHING_RELAY_PORT}
-    entrypoint: ["/bin/entrypoint.sh", "-pools=", "-status-srv=", "-listen=:${SYNCTHING_RELAY_PORT}", "-keys=/root"]
+    entrypoint: ["/bin/entrypoint.sh", "-pools=", "-listen=:${SYNCTHING_RELAY_PORT}", "-keys=/root"]
 
   syncthing-client:
     image: syncthing/syncthing
