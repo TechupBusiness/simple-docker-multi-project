@@ -1,0 +1,11 @@
+version: '3.5'
+
+services:
+  memcached:
+    image: memcached:${MEMCACHED_VERSION:-latest}
+    restart: always
+    entrypoint: memcached -m ${MEMCACHED_MEMORY:-256}
+    expose:
+      - 11211
+    networks:
+      - internal

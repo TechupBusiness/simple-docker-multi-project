@@ -1,0 +1,34 @@
+version: '3.5'
+services:
+
+  seafile:
+    image: seafileltd/seafile-mc:${SEAFILE_VERSION:-latest}
+    expose:
+      - 80
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/seafile-data:/shared
+    env_file:
+      - ../../docker-data/${PROJECT_NAME}/.env
+    environment:
+      - DB_HOST=mariadb
+      - DB_ROOT_PASSWD=${MARIADB_ROOT_PASSWORD}
+      - TIME_ZONE=${SEAFILE_TIMEZONE}
+      - SEAFILE_SERVER_LETSENCRYPT=false
+      - SEAFILE_SERVER_HOSTNAME=${WEB_HOST}
+    depends_on:
+      - mariadb
+      - memcached
+    networks:
+      - internal
+      - proxy
+    labels:
+      - "traefik.enable=${PROXY_TMP_ENABLED}"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
+
+# Note: to enable Webdav, check this ticket: https://forum.seafile.com/t/webdav-and-traefik-how/8939/2

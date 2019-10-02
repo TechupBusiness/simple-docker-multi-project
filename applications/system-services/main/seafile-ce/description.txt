@@ -1,0 +1,1 @@
+open source community version of seafile, self-hosted file share and communication platform like Dropbox, Google Drive, Box.com, etc. (required services: mysql, memcached)
