@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  notifier:
+    build:
+      context: .
+      dockerfile: "Dockerfile"
+      args:
+        - NOTIFIERS_USER=${NOTIFIERS_USER}
+        - NOTIFIERS_PASSWORD=${NOTIFIERS_PASSWORD}
+    env_file:
+      - ../configuration/.env
+    ports:
+      - 3222:3222
+    restart: always
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external:
+      name: traefik-proxy

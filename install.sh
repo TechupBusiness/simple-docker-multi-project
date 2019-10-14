@@ -105,6 +105,9 @@ echo "Preparing backup scheduler..."
 pathBackup="system/backup"
 editEnv "$pathBackup/template.env" "$pathConfig/.env" "interactive" "backup"
 
+echo "Preparing notifier..."
+pathNotifier="system/notifier"
+editEnv "$pathNotifier/template.env" "$pathConfig/.env" "interactive" "notifier"
 
 cd "$pathConfig"
 
@@ -115,6 +118,10 @@ $SUDO docker-compose -p "reverse-proxy" -f "../../$pathProxy/docker-compose.yml"
 echo "Starting backup scheduler..."
 $SUDO docker-compose -p "backup" -f "../../$pathBackup/docker-compose.yml" stop
 $SUDO docker-compose -p "backup" -f "../../$pathBackup/docker-compose.yml" up -d
+
+echo "Starting notifier..."
+$SUDO docker-compose -p "notifier" -f "../../$pathNotifier/docker-compose.yml" stop
+$SUDO docker-compose -p "notifier" -f "../../$pathNotifier/docker-compose.yml" up -d
 
 echo "
 
