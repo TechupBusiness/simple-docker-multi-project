@@ -3,6 +3,7 @@ version: '3.5'
 services:
   postfix:
     image: boky/postfix
+    restart: always
     volumes:
       - ../../docker-data/${PROJECT_NAME}/services/extra/postfix/keys:/etc/opendkim/keys
     expose:
