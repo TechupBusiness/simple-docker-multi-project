@@ -1,4 +1,4 @@
-FROM golang:1.12 AS builder
+FROM golang AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		git \
@@ -10,7 +10,7 @@ ENV CGO_ENABLED=0
 ENV BUILD_HOST=syncthing.net
 ENV BUILD_USER=docker
 
-RUN curl -L https://github.com/syncthing/syncthing/archive/`git ls-remote https://github.com/syncthing/syncthing | grep refs/tags | grep -oP "v[0-9]+\.[0-9]+\.[0-9]+$" | tail -n 1`.tar.gz | tar vxz --strip-components=1
+RUN curl -L https://github.com/syncthing/syncthing/archive/`git ls-remote https://github.com/syncthing/syncthing | grep refs/tags | grep -oP "v[0-9]+\.[0-9]+\.[0-9]+$" | sort --version-sort | tail -n 1`.tar.gz | tar vxz --strip-components=1
 RUN go run build.go -no-upgrade build strelaysrv
 
 FROM syncthing/syncthing
