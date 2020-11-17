@@ -1,1 +1,1 @@
-Publishing platform on nodeJS (required services: mysql)
+Publishing platform on nodeJS (using sqlite database)
