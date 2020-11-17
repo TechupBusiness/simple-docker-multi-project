@@ -34,12 +34,13 @@ defaultEntryPoints = ["http", "https"]
 # Default:
 [entryPoints]
   [entryPoints.http]
-  address = ":80"
+    address = ":80"
     [entryPoints.http.redirect]
-    entryPoint = "https"
+        entryPoint = "https"
   [entryPoints.https]
-  address = ":443"
-  [entryPoints.https.tls]
+    address = ":443"
+    compress = true
+    [entryPoints.https.tls]
 
 # Enable retry sending request if network error
 #
