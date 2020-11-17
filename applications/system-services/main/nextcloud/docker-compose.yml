@@ -28,6 +28,7 @@ services:
       - "SMTP_PORT=587"
       - "SMTP_AUTHTYPE="
       - "MAIL_FROM_ADDRESS=${NEXTCLOUD_EMAIL_SENDER}"
+      - "TRUSTED_PROXIES=traefik"
     depends_on:
       - mariadb
       - redis
