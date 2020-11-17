@@ -190,6 +190,7 @@ editEnv() {
         HIDDEN="0"
         BASICAUTH="0"
         SCRIPT="0"
+        DEFAULTVALUE="0"
         declare -A DESCRIPTIONS
         declare -A VALUES
         declare -A REQUIRED
@@ -213,7 +214,11 @@ editEnv() {
                 # Get existing value from target file
                 TARGET_VALUE=$(configGetValueByFile "${KEYVALUE[0]}" "$ENV_TARGET")
                 if [ -z "$TARGET_VALUE" ]; then
-                    TARGET_VALUE="${KEYVALUE[1]}"
+                    if [[ "$DEFAULTVALUE" == "1" ]]; then
+                        TARGET_VALUE=$(runScripts "$SERVICE_TYPE" "$SERVICE_NAME" "FieldDefaultValue" "$PROJECT" "${KEYVALUE[0]}")
+                    else
+                        TARGET_VALUE="${KEYVALUE[1]}"
+                    fi
                 fi
                 KEYS+=( "${KEYVALUE[0]}" )
                 VALUES["${KEYVALUE[0]}"]="$TARGET_VALUE"
@@ -243,6 +248,9 @@ editEnv() {
                 if [[ $line == *'[SCRIPT]'* ]]; then
                     SCRIPT="1"
                 fi
+                if [[ $line == *'[DEFAULT-VALUE]'* ]]; then
+                    DEFAULTVALUE="1"
+                fi
 
                 # Get description https://stackoverflow.com/questions/16623835/remove-a-fixed-prefix-suffix-from-a-string-in-bash
                 DESC="$DESC
@@ -257,6 +265,7 @@ ${line#"#"}"
                 HIDDEN="0"
                 BASICAUTH="0"
                 SCRIPT="0"
+                DEFAULTVALUE="0"
             fi
 
         done <"$ENV_SOURCE"
