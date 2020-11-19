@@ -1,1 +1,1 @@
-Allows to schedule cronjobs, contains a backup cronjobs for service "mysql" by default
+Allows to schedule cronjobs !!!NOT TESTED -> not used anywhere yet (TODO open)

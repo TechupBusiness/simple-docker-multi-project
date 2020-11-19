@@ -1,0 +1,7 @@
+# Periodic cron-jobs
+# min   hour    day     month   weekday command
+*       *       *       *       *       run-parts /cronjobs/jobs/minute
+*/5     *       *       *       *       run-parts /cronjobs/jobs/5minutes
+0       2       *       *       *       run-parts /cronjobs/jobs/daily
+0       0       *       *       0       run-parts /cronjobs/jobs/weekly
+0       0       1       *       *       run-parts /cronjobs/jobs/monthly

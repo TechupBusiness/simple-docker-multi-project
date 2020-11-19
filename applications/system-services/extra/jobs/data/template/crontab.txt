@@ -1,4 +1,0 @@
-# Periodic cron-jobs
-# min   hour    day     month   weekday command
-0       2       *       *       *       run-parts /cronjobs/daily
-
