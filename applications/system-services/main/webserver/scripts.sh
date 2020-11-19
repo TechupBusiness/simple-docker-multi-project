@@ -41,15 +41,6 @@ webserverBuild() {
 
     cat $PATH_SYSTEM_SERVICE/docker/begin.Dockerfile > "$BUILD_DOCKERFILE"
 
-    if [[ ! -z $WEB_HOST_FREE_ALIASES ]]; then
-        WEB_HOST_FREE_ALIASES="ServerAlias$WEB_HOST_FREE_ALIASES"
-    fi
-    sed -e "s/\${HOST}/$WEB_HOST/g" -e "s/\${HOST_ALIASES}/$WEB_HOST_FREE_ALIASES/g" -e "s/\${DIR}/$WEB_DIR_APP_HOST/g" "$PATH_SYSTEM_SERVICE/docker/vhosts.Dockerfile" >> "$BUILD_DOCKERFILE"
-    for domainHost in "${!HOST_DIR_MAPPING[@]}"; do
-        domainDir=${HOST_DIR_MAPPING[$domainHost]}
-        sed -e "s/\${HOST}/$domainHost/g" -e "s/\${HOST_ALIASES}//g" -e "s/\${DIR}/$domainDir/g" "$PATH_SYSTEM_SERVICE/docker/vhosts.Dockerfile" >> "$BUILD_DOCKERFILE"
-    done
-
     DOCKERFILE_MODULES=$(configGetValueByFile DOCKERFILE_MODULES "$ENV_FILE")
     locations="system custom"
     for serviceLocation in $locations; do
@@ -60,6 +51,15 @@ webserverBuild() {
                 cat "$moduleFile" >> "$BUILD_DOCKERFILE"
             fi
         done
+    done
+
+    if [[ ! -z $WEB_HOST_FREE_ALIASES ]]; then
+        WEB_HOST_FREE_ALIASES="ServerAlias$WEB_HOST_FREE_ALIASES"
+    fi
+    sed -e "s/\${HOST}/$WEB_HOST/g" -e "s/\${HOST_ALIASES}/$WEB_HOST_FREE_ALIASES/g" -e "s/\${DIR}/$WEB_DIR_APP_HOST/g" "$PATH_SYSTEM_SERVICE/docker/vhosts.Dockerfile" >> "$BUILD_DOCKERFILE"
+    for domainHost in "${!HOST_DIR_MAPPING[@]}"; do
+        domainDir=${HOST_DIR_MAPPING[$domainHost]}
+        sed -e "s/\${HOST}/$domainHost/g" -e "s/\${HOST_ALIASES}//g" -e "s/\${DIR}/$domainDir/g" "$PATH_SYSTEM_SERVICE/docker/vhosts.Dockerfile" >> "$BUILD_DOCKERFILE"
     done
 
     for projectModule in applications/docker-data/$PROJECT/services/main/webserver/docker/modules/*.Dockerfile; do
