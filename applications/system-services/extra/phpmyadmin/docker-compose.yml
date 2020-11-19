@@ -10,7 +10,7 @@ services:
     expose:
       - '80'
     environment:
-      - "PMA_HOST=mysql"
+      - "PMA_HOST=${PMA_HOST}"
       - "PMA_ABSOLUTE_URI=https://${PMA_WEB_HOST}/"
     labels:
       - "traefik.enable=true"
