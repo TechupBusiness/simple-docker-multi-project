@@ -1,1 +1,1 @@
-Enables PHP to send emails via postfix (you need to add also the email service then)
+NEW: Enables PHP to send emails via postfix (you need to add also the email service then)
