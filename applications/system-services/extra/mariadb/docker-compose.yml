@@ -25,5 +25,25 @@ services:
       timeout: 20s
       retries: 10
 
+  mariadb-backup:
+    build:
+      context: ../../system-services/extra/mariadb
+      dockerfile: backup.Dockerfile
+      args:
+        - UID=${USER_ID}
+        - GID=${GROUP_ID}
+    environment:
+      - "PROJECT=${PROJECT_NAME}"
+    env_file:
+      - ../../docker-data/${PROJECT_NAME}/.env
+    depends_on:
+      - mariadb
+    networks:
+      - internal
+    volumes:
+      - ../../backups/${PROJECT_NAME}/mariadb:/backups
+    command: "crond -f -d 8"
+    restart: always
+
 volumes:
   mariadb_vol:
