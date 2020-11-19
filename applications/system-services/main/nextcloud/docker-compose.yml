@@ -1,30 +1,56 @@
 version: '3.5'
 
 services:
-  nextcloud:
+  app: &nextcloudConfig
     build:
       context: ../../system-services/main/nextcloud
-      dockerfile: "Dockerfile"
+      dockerfile: "app.Dockerfile"
       args:
         - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION}
-        - USER_ID=${USER_ID}
-        - GROUP_ID=${GROUP_ID}
+        - UID=${USER_ID}
+        - GID=${GROUP_ID}
     restart: always
+    networks:
+      - internal
     volumes:
       - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/www/html/data
-      - config:/var/www/html/config
-      - apps:/var/www/html/apps
-    expose:
-      - 80
+      - nextcloud:/var/www/html
     env_file:
       - ../../docker-data/${PROJECT_NAME}/.env
     environment:
       - "REDIS_HOST=redis"
       - "MYSQL_HOST=mariadb"
+      - "MYSQL_USER=${MARIADB_USER}"
+      - "MYSQL_PASSWORD=${MARIADB_PASSWORD}"
+      - "MYSQL_DATABASE=${MARIADB_DATABASE}"
       - "NEXTCLOUD_TRUSTED_DOMAINS=${WEB_HOST} ${WEB_HOST_ALIASES}"
+      - "SMTP_HOST=postfix"
+      - "SMTP_PORT=587"
+      - "SMTP_AUTHTYPE="
+      - "MAIL_FROM_ADDRESS=${NEXTCLOUD_EMAIL_SENDER}"
     depends_on:
       - mariadb
       - redis
+      - postfix
+
+  cron:
+    <<: *nextcloudConfig
+    entrypoint: "/cron.sh"
+    command: ""
+
+  nginx:
+    build:
+      context: ../../system-services/main/nextcloud
+      dockerfile: "nginx.Dockerfile"
+      args:
+        - UID=${USER_ID}
+        - GID=${GROUP_ID}
+    volumes:
+      - ../../system-services/main/nextcloud/nginx.conf:/etc/nginx/nginx.conf.template:ro
+      - nextcloud:/var/www/html:ro
+    restart: always
+    environment:
+      - "WEB_HOST=${WEB_HOST}"
     networks:
       - proxy
       - internal
@@ -37,7 +63,8 @@ services:
       - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
       - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
       - "traefik.frontend.redirect.permanent=true"
+    depends_on:
+      - app
 
 volumes:
-  config:
-  apps:
+  nextcloud:
