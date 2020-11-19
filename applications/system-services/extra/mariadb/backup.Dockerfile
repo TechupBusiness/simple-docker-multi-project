@@ -5,7 +5,7 @@ ARG GID=1000
 
 RUN apk add --no-cache mariadb-client
 
-RUN echo "*/5       *       *       *       *       run-parts /cronjobs/daily" >> /etc/crontabs/jobs
+RUN echo "0       2       *       *       *       run-parts /cronjobs/daily" >> /etc/crontabs/jobs
 RUN echo "" > /etc/crontabs/root
 COPY database-backup.sh /cronjobs/daily/database-backup
 
