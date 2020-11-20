@@ -11,7 +11,7 @@ BACKUP_DIR="/backups"
 perform_backups()
 {
 	DATE_PATH_PART=$1
-  TARGET="$FINAL_BACKUP_DIR/$MARIADB_DATABASE-$DATE_PATH_PART"
+  TARGET="$BACKUP_DIR/$MARIADB_DATABASE-$DATE_PATH_PART"
   mysqldump --user=root --password="$MARIADB_ROOT_PASSWORD" --host=mariadb "$MARIADB_DATABASE" | bzip2 > "$TARGET.sql.bz2"
 }
 
