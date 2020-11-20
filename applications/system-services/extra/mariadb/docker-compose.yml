@@ -32,6 +32,7 @@ services:
       args:
         - UID=${USER_ID}
         - GID=${GROUP_ID}
+        - MARIADB_BACKUP_HOUR=${MARIADB_BACKUP_HOUR}
     environment:
       - "PROJECT=${PROJECT_NAME}"
     env_file:

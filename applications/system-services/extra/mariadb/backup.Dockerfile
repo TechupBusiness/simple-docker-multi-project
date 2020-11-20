@@ -2,10 +2,11 @@ FROM alpine:latest
 
 ARG UID=1000
 ARG GID=1000
+ARG MARIADB_BACKUP_HOUR=2
 
 RUN apk add --no-cache mariadb-client
 
-RUN echo "0       2       *       *       *       run-parts /cronjobs/daily" >> /etc/crontabs/jobs
+RUN echo "0       ${MARIADB_BACKUP_HOUR}       *       *       *       run-parts /cronjobs/daily" >> /etc/crontabs/jobs
 RUN echo "" > /etc/crontabs/root
 COPY database-backup.sh /cronjobs/daily/database-backup
 
