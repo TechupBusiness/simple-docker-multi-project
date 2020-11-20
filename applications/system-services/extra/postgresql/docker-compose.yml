@@ -10,10 +10,32 @@ services:
       - internal
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ../../instance-data/${PROJECT_NAME}/postgresql-backups:/backups
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  postgresql-backup:
+    build:
+      context: ../../system-services/extra/postgresql
+      dockerfile: backup.Dockerfile
+      args:
+        - UID=${USER_ID}
+        - GID=${GROUP_ID}
+        - POSTGRES_BACKUP_HOUR=${POSTGRES_BACKUP_HOUR}
+    environment:
+      - "PROJECT=${PROJECT_NAME}"
+    env_file:
+      - ../../docker-data/${PROJECT_NAME}/.env
+    depends_on:
+      - postgresql
+    networks:
+      - internal
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/postgresql-backups:/backups
+    command: "crond -f -d 8"
+    restart: always
 
 volumes:
   pgdata:
