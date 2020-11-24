@@ -1,0 +1,1 @@
+Plausible is a lightweight and open-source website analytics tool.

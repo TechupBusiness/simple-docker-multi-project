@@ -1,0 +1,50 @@
+version: '3.5'
+services:
+  plausible:
+    image: plausible/analytics:latest
+    restart: always
+#    command: tail -f /dev/null
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
+    depends_on:
+      - postgresql
+      - clickhouse
+      - postfix
+      - geoip
+    env_file:
+      - ../../docker-data/${PROJECT_NAME}/.env
+    expose:
+      - 8000
+    networks:
+      - proxy
+      - internal
+    environment:
+      - "GEOLITE2_COUNTRY_DB=/geoip/GeoLite2-Country.mmdb"
+      - "BASE_URL=https://${WEB_HOST}"
+      - "DATABASE_URL=ecto://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}"
+      - "CLICKHOUSE_DATABASE_URL=http://clickhouse:8123/${CLICKHOUSE_DB}"
+      - "SMTP_HOST_ADDR=postfix"
+      - "SMTP_HOST_PORT=587"
+      - "ADMIN_USER_EMAIL=${PLAUSIBLE_ADMIN_EMAIL}"
+      - "ADMIN_USER_NAME=${PLAUSIBLE_ADMIN_NAME}"
+      - "ADMIN_USER_PWD=${PLAUSIBLE_ADMIN_PASSWORD}"
+      - "SECRET_KEY_BASE=${PLAUSIBLE_SECRET}"
+      - "DISABLE_AUTH=${PLAUSIBLE_DISABLE_AUTH}"
+      - "DISABLE_REGISTRATION=${PLAUSIBLE_DISABLE_REGISTRATION}"
+      - "MAILER_EMAIL=${PLAUSIBLE_MAILER_EMAIL}"
+      - "GOOGLE_CLIENT_ID=${PLAUSIBLE_GOOGLE_CLIENT_ID}"
+      - "GOOGLE_CLIENT_SECRET=${PLAUSIBLE_GOOGLE_CLIENT_SECRET}"
+      - "TWITTER_CONSUMER_KEY=${PLAUSIBLE_TWITTER_CONSUMER_KEY}"
+      - "TWITTER_CONSUMER_SECRET=${PLAUSIBLE_TWITTER_CONSUMER_SECRET}"
+      - "TWITTER_ACCESS_TOKEN=${PLAUSIBLE_TWITTER_ACCESS_TOKEN}"
+      - "TWITTER_ACCESS_TOKEN_SECRET=${PLAUSIBLE_TWITTER_ACCESS_TOKEN_SECRET}"
+    volumes:
+      - geoip:/geoip:ro
+    labels:
+      - "traefik.enable=${PROXY_TMP_ENABLED}"
+      - "traefik.port=8000"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
