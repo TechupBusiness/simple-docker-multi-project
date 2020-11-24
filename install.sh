@@ -66,6 +66,19 @@ else
     echo "SKIPPED - docker-compose autocomplete already installed in ~/.bashrc"
 fi
 
+echo "Checking if multiproject autocomplete is installed..."
+AUTOCOMPLETE_INSTALLED=$(grep -wq "^source $PWD/system/autocomplete.sh" ~/.bashrc && echo "true" || echo "false")
+if [[ "$AUTOCOMPLETE_INSTALLED" == "false" ]]; then
+    {
+      echo ""
+      echo "# techupbusiness/multiproject: Autocomplete installed (should be located in $PWD)"
+      echo "source $PWD/system/autocomplete.sh"
+      echo ""
+    } >> ~/.bashrc
+    echo "DONE - multiproject autocomplete installed in ~/.bashrc"
+else
+    echo "SKIPPED - multiproject autocomplete already installed in ~/.bashrc"
+fi
 
 echo "Checking if htpasswd is installed..."
 command -v htpasswd >/dev/null 2>&1 || {
