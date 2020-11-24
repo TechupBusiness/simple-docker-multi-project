@@ -1,0 +1,19 @@
+version: '3.5'
+services:
+  clickhouse:
+    image: yandex/clickhouse-server:latest
+    restart: always
+    volumes:
+      - clickhouse:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - internal
+
+volumes:
+  clickhouse:
+
+# TODO Set user/pw and create db ?!
+# TODO BACKUP-SOLUTION!!
