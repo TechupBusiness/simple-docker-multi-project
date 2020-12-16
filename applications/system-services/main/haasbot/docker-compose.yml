@@ -1,0 +1,61 @@
+version: '3.5'
+
+services:
+  haasbot:
+    restart: always
+    build:
+      context: ../../system-services/main/haasbot
+      dockerfile: haasbot.Dockerfile
+    environment:
+      - "WEB_HOST=${WEB_HOST}"
+      - "SOCKET_HOST=${HAASBOT_WEBSOCKET_DOMAIN}"
+      - "CONFIGFIX_SLEEP=${HAASBOT_CONFIGFIX_SLEEP}"
+      - "DEBUG_MODE=${HAASBOT_DEBUG_MODE}"
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/haas-install:/haasbot/install
+      - ../../instance-data/${PROJECT_NAME}/haas-data:/root/HTS
+    networks:
+      - internal
+
+  nginx-web:
+    restart: always
+    build:
+      context: ../../system-services/main/haasbot
+      dockerfile: "nginx.Dockerfile"
+    environment:
+      - "WEB_HOST=${WEB_HOST}"
+      - "WEB_PORT=8090"
+    networks:
+      - internal
+      - proxy
+    depends_on:
+      - haasbot
+    labels:
+      - "traefik.enable=${PROXY_TMP_ENABLED}"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
+
+  nginx-socket:
+    restart: always
+    build:
+      context: ../../system-services/main/haasbot
+      dockerfile: "nginx.Dockerfile"
+    environment:
+      - "WEB_HOST=${HAASBOT_WEBSOCKET_DOMAIN}"
+      - "WEB_PORT=8092"
+    networks:
+      - internal
+      - proxy
+    depends_on:
+      - haasbot
+    labels:
+      - "traefik.enable=${PROXY_TMP_ENABLED}"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:${HAASBOT_WEBSOCKET_DOMAIN}"
+#      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
