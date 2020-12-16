@@ -5,8 +5,8 @@ services:
     image: ghost:${GHOST_VERSION:-alpine}
     restart: always
     volumes:
-      - ../../instance-data/${PROJECT_NAME}/${WEB_ROOT_DOCKER_HOST}:/var/lib/ghost/content
-      - ../../logs/${PROJECT_NAME}/ghost:/var/log/ghost
+      - ../../instance-data/${PROJECT_NAME}/ghost-content:/var/lib/ghost/content
+      - ../../instance-data/${PROJECT_NAME}/ghost-logs:/var/log/ghost
     expose:
       - 2368
     environment:
@@ -16,7 +16,6 @@ services:
       - "url=https://${WEB_HOST}"
     networks:
       - proxy
-      - internal
     labels:
       - "traefik.enable=${PROXY_TMP_ENABLED}"
       - "traefik.port=2368"
