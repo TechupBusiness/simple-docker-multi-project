@@ -14,7 +14,10 @@ mailerSetup() {
     PWD_BAK=$PWD
 
     if [[ ! -z $MAIL_DKIM_SELECTOR ]]; then
-        requireCommand "opendkim-genkey" "opendkim-genkey is usually in your favourite distribution provided by installing opendkim-tools or opendkim-utils"
+      if [[ -f "$SERVICE_PATH/$MAIL_HOST.private" ]]; then
+        echo "DKIM private key found ($SERVICE_PATH/$MAIL_HOST.private), skip generating a new key"
+      else
+        requireCommand "opendkim-genkey" "opendkim-genkey is usually in your favourite distribution provided by installing opendkim-tools or opendkim-utils. !!! Alternatively place your existing DKIM private key here: $SERVICE_PATH/$MAIL_HOST.private"
 
         mkdir -p $SERVICE_PATH
         cd $SERVICE_PATH
