@@ -13,7 +13,7 @@ echo "#     TechupBusiness/MultiProject for docker single server installations  
 echo "#              Script to check and prepare your environment ...              #"
 echo "##############################################################################"
 
-echo "NOTE: This script is not touching (starting/stopping) your existing projects."
+echo "NOTE: This script is not touching (starting/stopping) your existing projects (but the reverse-proxy = accessibility online)."
 
 #################
 # Checking for some applications
@@ -60,6 +60,9 @@ command -v docker-compose >/dev/null 2>&1 || {
 
 echo "Checking if docker-compose autocomplete is installed..."
 if [[ ! -f /etc/bash_completion.d/docker-compose ]]; then
+    requireCommand "curl"
+    requireCommand "grep"
+    requireCommand "sh"
     COMPOSE_VERSION=$(docker-compose --version | grep -oP "[0-9]+\.[0-9][0-9]+\.[0-9]+")
     $SUDO sh -c "curl -L https://raw.githubusercontent.com/docker/compose/${COMPOSE_VERSION}/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose"
 else
@@ -83,8 +86,9 @@ fi
 echo "Checking if htpasswd is installed..."
 command -v htpasswd >/dev/null 2>&1 || {
     echo >&2 "htpasswd (apache2-utils) is missing to create basic authentication logins!"
-    read -p "   Do you want to install it now? (y/n): " INSTALL_HTPASSWD
+    read -p "   Do you want to install it now using apt? (y/n): " INSTALL_HTPASSWD
 
+    # TODO remove apt dependency
     if [[ $INSTALL_HTPASSWD == "y" ]]; then
         requireCommand "apt-get"
         $SUDO apt-get update
@@ -104,43 +108,21 @@ for SCRIPT in *.sh; do
 done
 echo "DONE - checked command scripts"
 
-pathConfig="system/configuration"
-
-echo "Checking if reverse-proxy is configured..."
-pathProxy="system/reverse-proxy"
-if [[ ! -f "$pathConfig/acme.json" ]]; then
-    cp "$pathProxy/acme-template.json" "$pathConfig/acme.json"
-    echo "DONE - Configured reverse-proxy (created acme.json)"
-else
-    echo "SKIPPED - Configuration for reverse-proxy already exists (acme.json)."
-fi
-
-echo "Checking reverse-proxy configuration (acme.json)..."
-if [[ -f "$pathConfig/acme.json" ]] && [[ $(stat --format '%a' "$pathConfig/acme.json") != "600" ]]; then
-    chmod 600 "$pathConfig/acme.json"
-    echo "Set permission of acme.json to 600."
-fi
-editEnv "$pathProxy/template.env" "$pathConfig/.env" "interactive" "reverseproxy"
-echo "DONE - Configured reverse-proxy configuration"
-
-echo "Checking backup scheduler..."
-pathBackup="system/backup"
-editEnv "$pathBackup/template.env" "$pathConfig/.env" "interactive" "backup"
-echo "DONE - Configured backup scheduler"
-
-cd "$pathConfig"
-
-echo "(Re)Starting reverse-proxy (and reloading env configuration)..."
-$SUDO docker-compose -p "reverse-proxy" -f "../../$pathProxy/docker-compose.yml" stop
-$SUDO docker-compose -p "reverse-proxy" -f "../../$pathProxy/docker-compose.yml" up -d
-echo "DONE - (Re)Starting reverse-proxy"
-
-echo "(Re)Starting backup scheduler (and reloading env configuration)..."
-$SUDO docker-compose -p "backup" -f "../../$pathBackup/docker-compose.yml" stop
-$SUDO docker-compose -p "backup" -f "../../$pathBackup/docker-compose.yml" up -d
-echo "DONE - (Re)Starting backup scheduler"
+for service in system/*; do
+    if [[ -d "$service" ]]; then
+      serviceName=$(basename "$service")
+      editEnv "system/$serviceName/template.env" "system/configuration/.env" "interactive" "$serviceName"
+      runScript "system/$serviceName" "Setup" "multiproject-system" "$serviceName"
+    fi
+done
 
 echo "
 
 --------------------
-Run ./project.sh <name> to add your first application. Or see README.md for more information how to add new services."
+Run to start all your configured multiproject system services (reverse-proxy, backup, image-update watcher, system-mailer):
+ > ./admin.sh up -d
+
+Run afterwards to add your first application:
+ > ./project.sh <name>
+
+"

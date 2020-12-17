@@ -1,4 +1,5 @@
 version: '3.5'
+
 services:
   restic:
     build:
@@ -9,6 +10,8 @@ services:
       - RESTIC_PASSWORD=${BACKUP_RESTIC_PASSWORD}
     env_file:
       - ../configuration/.env
+    networks:
+      - sys-internal
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ../../:/docker-projects:ro

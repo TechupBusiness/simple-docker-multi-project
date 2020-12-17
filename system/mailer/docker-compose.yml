@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  mailer:
+    image: boky/postfix
+    restart: always
+    volumes:
+      - ../configuration/dkim:/etc/opendkim/keys
+    expose:
+      - "587"
+    networks:
+      - sys-internal
+    environment:
+      - "HOSTNAME=${MAIL_HOST}"
+      - "ALLOWED_SENDER_DOMAINS=${MAIL_HOST}"

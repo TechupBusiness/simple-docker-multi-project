@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  watchtower:
+    image: containrrr/watchtower
+    hostname: "${MAIL_HOST}"
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --no-startup-message --cleanup --monitor-only --notifications email --notification-email-server postfix --notification-email-server-port 587 --notification-email-delay 2
+    networks:
+      - sys-internal
+    depends_on:
+      - mailer
+    environment:
+      - "WATCHTOWER_NOTIFICATION_EMAIL_FROM=${MAIL_SENDER_EMAIL}"
+      - "WATCHTOWER_NOTIFICATION_EMAIL_TO=${WATCHTOWER_EMAIL_TO}"
+      - "WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_CHECK_INTERVAL}"

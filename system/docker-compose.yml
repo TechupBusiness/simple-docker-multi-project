@@ -1,0 +1,6 @@
+version: '3.5'
+
+# This file is the base config file for multi-project services
+networks:
+  sys-internal:
+    external: false

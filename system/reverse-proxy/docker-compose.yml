@@ -11,6 +11,7 @@ services:
     restart: always
     networks:
       - traefik-proxy
+      - sys-internal
     ports:
       - "80:80"
       - "443:443"
