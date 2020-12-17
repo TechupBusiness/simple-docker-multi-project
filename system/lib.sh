@@ -67,18 +67,21 @@ editEnvInteractiveVariableExecution() {
 
     echo "$DESCRIPTION"
 
-    title=" ========> "
+    title_color="\e[1m"
     if [[ "$REQUIRED" = "1" ]]; then
-        title="$title!!! "
+        title_color="\e[91m$title_color "
+    else
+        title_color="\e[92m$title_color"
     fi
-    title="${title}Set $VARIABLE"
+    title="> $VARIABLE"
 
     if [ ! -z "$EXISTING_VALUE" ]; then
         title="$title (default: \"$EXISTING_VALUE\")"
     fi
 
+    echo -e "$title_color"
     if [[ ! "$BASICAUTH" = "1" ]]; then
-        title="$title to >: "
+        title="$title: "
         read -p "$title" NEW_VALUE
     else
         echo "$title"
@@ -100,6 +103,7 @@ editEnvInteractiveVariableExecution() {
             NEW_VALUE=""
         fi
     fi
+    echo -e "\e[0m"
 
     if [ -z "$NEW_VALUE" ] && [ -z "$EXISTING_VALUE" ] && [ "$REQUIRED" == 1 ]; then
         echo "
@@ -112,9 +116,9 @@ VARIABLE \"$VARIABLE\" IS REQUIRED! PLEASE PROVIDE A VALUE!"
         fi
         configReplaceValue "$ENV_TARGET" "$VARIABLE" "$NEW_VALUE"
 
-        echo "-------------------------------------------------------------------------------------------"
+        echo -e "\e[92m-------------------------------------------------------------------------------------------\e[0m"
     else
-        echo "-------------------------------------------------------------------------------------------"
+        echo -e "\e[92m-------------------------------------------------------------------------------------------\e[0m"
     fi
 
 }
@@ -175,12 +179,12 @@ editEnv() {
         exit
     else
         if [ ! -z "$SERVICE_NAME" ]; then
-            PRINT_CONFIG_HEADER="##########################################
-#
-# SERVICE $SERVICE_NAME
-#
-##########################################"
-            echo "$PRINT_CONFIG_HEADER"
+            PRINT_CONFIG_HEADER="\e[44m\e[97m\e[1m##########################################
+#                                        #
+# SERVICE $SERVICE_NAME                  #
+#                                        #
+##########################################\e[0m"
+            echo -e "$PRINT_CONFIG_HEADER"
         fi
 
         BEGIN_DESC=0
