@@ -388,10 +388,11 @@ getServicePath() {
     done
 }
 
-# $1 Path
-# $2 Method
-# $3 Project name
-# $4 service
+# $1 Path to scripts.sh
+# $2 Method (in scripts.sh servicename+methodname() )
+# $3 Project name (is first parameter given to serviceMethod()
+# $4 service (only used to build the method name, see $2 method)
+# $5++ additional parameter for script
 runScript() {
     path="$1"
     methods="$2"
