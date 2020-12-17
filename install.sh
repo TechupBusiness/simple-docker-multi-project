@@ -8,7 +8,7 @@ if (( $EUID != 0 )); then
     SUDO='sudo '
 fi
 
-echo -e "\e[1m\e[97m\e[42m
+echo -e "$TEXT_BOLD $TEXT_WHITE $TEXT_BG_GREEN
 ##############################################################################
 #     TechupBusiness/MultiProject for docker single server installations     #
 #              Script to check and prepare your environment ...              #
@@ -18,7 +18,7 @@ NOTES:
  - This script is not touching (starting/stopping) your existing projects
    (but the reverse-proxy = accessibility online).
  - If you don't enter values for your configuration, it will use the default values (if exist).
-\e[0m\e[49m
+$TEXT_CLEAR
 "
 
 #################
@@ -112,9 +112,7 @@ for SCRIPT in *.sh; do
         echo "Made $SCRIPT executable"
     fi
 done
-echo "DONE - checked command scripts
-
-"
+echo "DONE - checked command scripts"
 
 for service in system/services/*; do
     if [[ -d "$service" ]]; then
@@ -125,12 +123,12 @@ for service in system/services/*; do
 done
 
 echo -e "
-\e[1m\e[97m\e[42m
+$TEXT_BOLD $TEXT_WHITE $TEXT_BG_GREEN
 --------------------
 Run to start all your configured multiproject system services (reverse-proxy, backup, image-update watcher, system-mailer):
  > ./admin.sh up -d
 
 Run afterwards to add your first application:
  > ./project.sh <name>
-\e[0m\e[49m
+$TEXT_CLEAR
 "

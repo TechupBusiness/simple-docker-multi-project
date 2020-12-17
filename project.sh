@@ -67,10 +67,11 @@ stepRunEnv "$PROJECT_ENV" "$PROJECT"
 stepRunScripts "$PROJECT_ENV" "Setup" "$PROJECT"
 
 
-echo -e "\e[1m\e[97m\e[42m
+echo -e "$TEXT_BOLD $TEXT_WHITE $TEXT_BG_GREEN
 NOTES:"
 
 stepRunScripts "$PROJECT_ENV" "Instructions" "$PROJECT"
 
 echo -e "-------------
-Enjoy!\e[0m\e[49m"
+Enjoy!
+$TEXT_CLEAR"

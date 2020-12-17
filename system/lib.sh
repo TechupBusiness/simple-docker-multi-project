@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Text colors as variables
+TEXT_BG_BLUE="\e[44m"
+TEXT_BG_GREEN="\e[42m"
+TEXT_BG_RED="\e[41m"
+TEXT_BG_DEFAULT="\e[49m"
+TEXT_WHITE="\e[97m"
+TEXT_GREEN="\e[92m"
+TEXT_RED="\e[91m"
+TEXT_BLUE="\e[34m"
+TEXT_BOLD="\e[1m"
+TEXT_CLEAR="\e[0m"
 
 # Usage: result=$(isIn "bla" "foo bar bla") && echo $result
 isIn() {
@@ -67,11 +78,11 @@ editEnvInteractiveVariableExecution() {
 
     echo "$DESCRIPTION"
 
-    title_color="\e[1m"
+    title_color="$TEXT_BOLD"
     if [[ "$REQUIRED" = "1" ]]; then
-        title_color="\e[91m$title_color "
+        title_color="$TEXT_RED$title_color "
     else
-        title_color="\e[92m$title_color"
+        title_color="$TEXT_BLUE$title_color"
     fi
     title="> $VARIABLE"
 
@@ -103,7 +114,7 @@ editEnvInteractiveVariableExecution() {
             NEW_VALUE=""
         fi
     fi
-    echo -e "\e[0m"
+    echo -e "$TEXT_CLEAR"
 
     if [ -z "$NEW_VALUE" ] && [ -z "$EXISTING_VALUE" ] && [ "$REQUIRED" == 1 ]; then
         echo "
@@ -116,9 +127,9 @@ VARIABLE \"$VARIABLE\" IS REQUIRED! PLEASE PROVIDE A VALUE!"
         fi
         configReplaceValue "$ENV_TARGET" "$VARIABLE" "$NEW_VALUE"
 
-        echo -e "\e[92m-------------------------------------------------------------------------------------------\e[0m"
+        echo -e "$TEXT_GREEN-------------------------------------------------------------------------------------------$TEXT_CLEAR"
     else
-        echo -e "\e[92m-------------------------------------------------------------------------------------------\e[0m"
+        echo -e "$TEXT_GREEN-------------------------------------------------------------------------------------------$TEXT_CLEAR"
     fi
 
 }
@@ -179,11 +190,12 @@ editEnv() {
         exit
     else
         if [ ! -z "$SERVICE_NAME" ]; then
-            PRINT_CONFIG_HEADER="\e[44m\e[97m\e[1m##########################################
+            PRINT_CONFIG_HEADER="$TEXT_WHITE $TEXT_BOLD $TEXT_BG_BLUE
+##########################################
 #                                        #
 # SERVICE $SERVICE_NAME                  #
 #                                        #
-##########################################\e[0m"
+##########################################$TEXT_CLEAR"
             echo -e "$PRINT_CONFIG_HEADER"
         fi
 
