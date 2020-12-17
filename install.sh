@@ -116,11 +116,11 @@ echo "DONE - checked command scripts
 
 "
 
-for service in system/*; do
+for service in system/services/*; do
     if [[ -d "$service" ]]; then
       serviceName=$(basename "$service")
-      editEnv "system/$serviceName/template.env" "system/configuration/.env" "interactive" "$serviceName"
-      runScript "system/$serviceName" "Setup" "multiproject-system" "$serviceName"
+      editEnv "system/services/$serviceName/template.env" "system/configuration/.env" "interactive" "$serviceName"
+      runScript "system/services/$serviceName" "Setup" "multiproject-system" "$serviceName"
     fi
 done
 

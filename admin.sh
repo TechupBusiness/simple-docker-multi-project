@@ -11,18 +11,16 @@ fi
 cd "system/configuration"
 
 # get all system services together when starting (exclude configuration folder)
-SERVICES=" -f \"../docker-compose.yml\""
-for service in ../*; do
+SERVICES="-f \"../docker-compose.yml\""
+for service in ../services/*; do
     if [[ -d "$service" ]]; then
       serviceName=$(basename "$service")
       if [[ "$serviceName" == "$1" ]] && [[ -z "$2" ]]; then
-        editEnv "../$serviceName/template.env" ".env" "interactive" "$serviceName"
-        runScript "../$serviceName" "Setup" "multiproject-system" "$serviceName"
+        editEnv "../services/$serviceName/template.env" ".env" "interactive" "$serviceName"
+        runScript "../services/$serviceName" "Setup" "multiproject-system" "$serviceName"
         exit
       fi
-      if [[ "$serviceName" != "configuration" ]]; then
-          SERVICES="$SERVICES -f \"../$serviceName/docker-compose.yml\""
-      fi
+      SERVICES="$SERVICES -f \"../$serviceName/docker-compose.yml\""
     fi
 done
 
