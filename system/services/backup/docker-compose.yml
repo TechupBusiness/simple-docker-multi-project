@@ -3,7 +3,7 @@ version: '3.5'
 services:
   restic:
     build:
-      context: .
+      context: ../../system/services/backup
       dockerfile: Dockerfile
     restart: always
     environment:

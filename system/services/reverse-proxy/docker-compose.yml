@@ -1,13 +1,12 @@
 version: '3.5'
 services:
   traefik:
-    container_name: traefik
     image: traefik:${TRAEFIK_VERSION:-alpine}
     command: '--acme.email=${TRAEFIK_ADMIN_EMAIL}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik.toml:/traefik.toml
-      - ../configuration/acme.json:/acme.json
+      - ../../system/services/reverse-proxy/traefik.toml:/traefik.toml
+      - ../../system/configuration/acme.json:/acme.json
     restart: always
     networks:
       - traefik-proxy
