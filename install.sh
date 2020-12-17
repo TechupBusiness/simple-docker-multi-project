@@ -124,13 +124,13 @@ for service in system/services/*; do
     fi
 done
 
-echo "
-
+echo -e "
+\e[1m\e[97m\e[42m
 --------------------
 Run to start all your configured multiproject system services (reverse-proxy, backup, image-update watcher, system-mailer):
  > ./admin.sh up -d
 
 Run afterwards to add your first application:
  > ./project.sh <name>
-
+\e[0m\e[49m
 "
