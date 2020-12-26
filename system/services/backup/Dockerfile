@@ -33,7 +33,9 @@ RUN     cd /root && \
         mkdir -p /root/.ssh && \
         touch /root/.ssh/config && \
         echo 'ServerAliveInterval 60' >> /root/.ssh/config && \
-        echo 'ServerAliveCountMax 240' >> /root/.ssh/config
+        echo 'ServerAliveCountMax 240' >> /root/.ssh/config && \
+        # Set weekly to midnight, as the backup starts as 2 and keeps often running longer than 3am
+        sed -i "s|3|0|g" /etc/crontabs/root
 
 COPY entrypoint.sh /
 
