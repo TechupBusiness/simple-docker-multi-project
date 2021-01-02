@@ -190,13 +190,13 @@ editEnv() {
         exit
     else
         if [ ! -z "$SERVICE_NAME" ]; then
-            PRINT_CONFIG_HEADER="$TEXT_WHITE $TEXT_BOLD $TEXT_BG_BLUE
+            PRINT_CONFIG_HEADER="
 ##########################################
 #                                        #
 # SERVICE $SERVICE_NAME                  #
 #                                        #
-##########################################$TEXT_CLEAR"
-            echo -e "$PRINT_CONFIG_HEADER"
+##########################################"
+            echo "$PRINT_CONFIG_HEADER"
         fi
 
         BEGIN_DESC=0
