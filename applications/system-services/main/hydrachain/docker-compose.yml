@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  hydrachain:
+    image: locktrip/hydra-node
+    restart: always
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}:/root/.hydra
+    ports:
+      - "3338:3338"
+      - "13333:13333"
+    environment:
+      - "TZ=Europe/Zurich"
+    networks:
+      - internal

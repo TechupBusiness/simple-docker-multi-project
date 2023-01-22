@@ -1,0 +1,1 @@
+Hydra wallet for staking, see https://hydrachain.org
