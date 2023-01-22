@@ -14,7 +14,14 @@ TEXT_BOLD="\e[1m"
 TEXT_CLEAR="\e[0m"
 
 # Outputs date to log
-echo -e "${TEXT_BG_BLUE}${TEXT_BOLD}${TEXT_WHITE}BACKUP STARTED $(date)$TEXT_CLEAR"
+echo -e "
+${TEXT_BG_BLUE}${TEXT_BOLD}${TEXT_WHITE}####################################
+####################################
+
+BACKUP STARTED $(date)
+
+####################################
+####################################$TEXT_CLEAR"
 
 # Variables
 PROJECT_FOLDER_PARENTS="applications/backups applications/cronjobs applications/docker-data applications/instance-data applications/logs"

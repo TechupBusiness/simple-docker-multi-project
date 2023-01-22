@@ -25,4 +25,4 @@ fi
 CMD_RESTIC="restic -r $BACKUP_RESTIC_REPO $O_PARAM init"
 eval $CMD_RESTIC
 
-crond -f -d 8
+crond -f -l 4
