@@ -9,7 +9,9 @@ services:
     volumes:
       - keys:/root
     networks:
-      - internal
+      internal:
+        aliases:
+          - "${WEB_HOST}"
     ports:
       - ${SYNCTHING_RELAY_PORT}:${SYNCTHING_RELAY_PORT}
     entrypoint: ["/bin/entrypoint.sh", "-pools=", "-listen=:${SYNCTHING_RELAY_PORT}", "-keys=/root"]
