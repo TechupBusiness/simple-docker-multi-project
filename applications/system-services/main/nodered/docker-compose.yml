@@ -1,0 +1,23 @@
+version: '3.5'
+
+services:
+  nodered:
+    image: nodered/node-red:latest
+    restart: always
+    environment:
+      - TZ=Europe/Amsterdam
+    networks:
+      - proxy
+      - internal
+    user: "${USER_ID}"
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/nodered:/data
+    labels:
+      - "traefik.enable=${PROXY_TMP_ENABLED}"
+      - "traefik.port=1880"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
