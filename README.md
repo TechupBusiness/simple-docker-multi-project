@@ -2,32 +2,41 @@
 This project is a **lightweight** fully featured modular multi-project architecture using docker, 
 completely configurable by just one `.env` file per project.
 
-At the moment is is focussing on web-applications and web-APIs, serving all projects (=applications) via a reverse-proxy (traefik) on multiple domains (automatic SSL).
-Docker knowledge is not required to get started, all services can be configured in a single `.env` file.
+It is serving all projects (=applications) via a reverse-proxy (traefik) on multiple domains (automatic SSL - LetEncrypt).
+Docker knowledge is not required to get started, all services can be configured via scripts, that only creates a single `.env` 
+file for each project that can be edited manually.
+All magic these multiproject scripts do, can also be executed manually only using docker-compose.
 Having Docker knowledge allows to add new and extend existing services (databases, caches, ...). Pull requests are welcome! 
 
 If you need a cloud infrastructure for multiple server (like kubernetes or docker swarm), you better start using another project. 
-Cloud functionality will maybe come one day to this project, but not for now.
+Cloud functionality will maybe come one day to this project, but not for now. It is meant for a single server installation.
 
 The "shipped" system services are mostly using official repositories. Therefore all projects created by this setup
-will be always up-to-date, even if there is no update in this project. It's just an architecture "helper", not an application.
+will be always up-to-date, even if there is no update in this project. This project is just an architecture "helper", not an application.
+It offers best practice and wrappers for official tools, to make your life easier.
 
 To get started (for example in the home directory `~/`):
 ```
 git clone https://github.com/TechupBusiness/simple-docker-multi-project.git && cd simple-docker-multi-project && ./install.sh
 ```
 This will help to setup the most basic settings. Behind the scenes it's creating an `.env` file, based on the user input, for the 
-containerized reverse-proxy before starting it.
+core services.
 
-To add the first project type:
+To start the configured core services (which is simply baking together all `docker-compose.yml` and `.env` files) run:
+```
+./admin.sh up -d
+```
+
+To add the first project run:
 ```
 ./project.sh
 ```
-This will guide through the creation of a new project. Behind the scenes it will simply bake together a `.env` file. 
+This will guide through the creation of a new project. Behind the scenes it will simply create an `.env` file for the project, containing
+all needed settings for the chosen service. 
 Depending on the service it may do some additional work (e.g. generating a Dockerfile or creating needed folders for content and backups, 
 please see [here](#under-the-hood---services-in-the-spot-light) for details on each service).
 
-**NOTE:** Even though there are bash-scripts and many folder, the architecture is simple and straight forward. There are just a few conventions you need
+**NOTE:** Even though there are bash-scripts and many folders, the architecture is simple and straightforward. There are just a few conventions you need
 to be aware of, if you want to add or modify services.
 
 **Table of contents**
@@ -85,11 +94,15 @@ You could still run complex commands, append all configuration file templates in
 
 ## Shipped easy-to-use services
 Services are separated into two categories: "main" and "extra". Main services are the reason for creating a project (e.g. webserver for PHP based applications).
-Extra services supports the main service of a project (e.g. a database or email service).
+Extra services supports the main service of a project (e.g. a database or email service). In the future these two service-types will be merged together, then we will onky have "services" with dependencies.
+
+NOTE: You will find additional information for each service in a README.md file, placed in the service folder.
 
 - System (core)
-  - [traefik](#traefik---reverse-proxy): reverse proxy to route incoming http/https traffic for multiple domains to your containerized services/applications
-  - [restic](#restic---backup-solution): efficient opensource backup solution written in Go. Creates backups of all data within this project
+  - [reverse-proxy](#traefik---reverse-proxy): reverse proxy [traefik](https://traefik.io/) to route incoming http/https traffic for multiple domains to your containerized services/applications
+  - [backup](#restic---backup-solution): efficient opensource backup solution written in Go. Creates backups of all data within this project
+  - Watchtower: Monitors upstream images for changes on docker hub (does not work yet with services that uses a Dockerfile)
+  - Mailer: a slim postfix server to deliver system messages
 - Main
   - [webserver](#webserver-apachephp): flexible apache webserver for php applications
   - [dropbox](#dropbox): File share cloud provider
@@ -97,6 +110,8 @@ Extra services supports the main service of a project (e.g. a database or email 
   - [nextcloud](#nextcloud): open source, self-hosted file share and communication platform (like Dropbox, Google Drive, Box.com, ...)
   - [nodejs](#nodejs): generic for all node.js applications
   - [syncthing](#syncthing): efficient open source P2P synchronization (Dropbox replacement)
+  - haasbot: A crypto-currency bot, easy start for everyone
+  - plausible: A lightweight web analytics tool
 - Extra
   - [email](#email-postfix-server): Postfix server to send emails
   - [jobs](#cronjobs): Cronjobs, includes a backup for database (mariaDB)
@@ -162,66 +177,6 @@ mydomain.com/categories/food -> Project 1
 ### Main services
 Main services are THE main service of a project. They are the reason why someone would want to create a project with this architecture.
 
-#### webserver (apache+php)
-This service uses apache and allows to run ANY kind of PHP based web-application in nearly all PHP versions (good for legacy applications).
-It is creating a generated Dockerfile based on the project `.env` settings. 
-
-It is using the docker container `php:{PHP_VERSION}-apache` (PHP version can be configured). Please check [their documentation](https://hub.docker.com/_/php) for more information.
-
-##### Storing web data files
-The website files must be copied to `applications/instance-data/{PROJECT}/` (or a sub-folder, depending on the settings `WEB_ROOT_DOCKER_HOST`, `WEB_DIR_APP_HOST` and `WEB_DIR_APP_ALIASES`).
-
-##### Adding new modules/libraries
-It's easy to add new modules and libraries to the `webserver` service. Most cases can be covered by configuring the following settings: `PHP_EXTENSIONS`, `APACHE_MODULES` and `APT_LIBS`.
-If this is not enough, it's possible to add custom "modules", which are in fact just partial `Dockerfile` pieces. 
-To add a new module, it's necessary to create in `applications/custom-services/main/webserver/docker/modules` (or in `docker-data/{PROJECT}/services/main/webserver/docker/modules` for a specific project) a file named `YOUR-MODULE-NAME.Dockerfile` (it's an incomplete/partial Dockerfile) and `YOUR-MODULE-NAME.txt` (with a short description of the new module).
-Next step is to run `./project.sh {PROJECT}` for reconfiguration of the setting `DOCKERFILE_MODULES` to add the new module "YOUR-MODULE".
-
-Examples for `YOUR-MODULE.Dockerfile`:
-```
-# ssmtp.Dockerfile
-
-RUN apt-get install -y --no-install-recommends \
-    ssmtp
-
-# Config SSMTP to use our postfix
-RUN { \
-    echo 'mailhub=postfix:587'; \
-    echo 'FromLineOverride=YES'; \
-	} > /etc/ssmtp/ssmtp.conf
-
-# Write php.ini
-RUN { \
-    echo '[mail function]'; \
-    echo 'sendmail_path = "/usr/sbin/ssmtp -t"'; \
-	} > /usr/local/etc/php/conf.d/ssmtp.ini
-```
-As shown in this example, it's possible to write files into the container (e.g. to customized php.ini settings)
-
-```
-# gd.Dockerfile:
-
-RUN apt-get install -y --no-install-recommends \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev
-
-# Config Extensions
-RUN docker-php-ext-configure gd \
-            --enable-gd-native-ttf \
-            --with-freetype-dir=/usr/include/freetype2 \
-            --with-png-dir=/usr/include \
-            --with-jpeg-dir=/usr/include \
-    && docker-php-ext-install gd
-```
-As demonstrated in this example, it's possible to install and configure additional PHP modules easily (more information in the [php-docker documentation](https://hub.docker.com/_/php#php-core-extensions)). 
-
-##### Multiple domains on one webserver
-Most of the time it makes sense to run one website per webserver service (which makes it easy then to move to another server). 
-But sometimes it is useful to run multiple website, especially if they
-are strongly coupled (relevant settings for this scenario are `WEB_HOST_ALIASES`, `WEB_DIR_APP_HOST` and `WEB_DIR_APP_ALIASES`). 
-Downside for this solution is a less independent architecture of projects and security concerns. Because an attacker, which breaks into one website (e.g. old wordpress) can easily 
-get access to other websites in the same project-instance.
 
 ##### Troubleshooting
 ###### Infinite redirect loops
@@ -296,14 +251,14 @@ PHPMyAdmin is a web-administration-interface for mysql compatible databases.
 * `compose.sh {PROJECT} {COMMAND}`: Controls (e.g. starts and stops) the project application (see [compose.sh commands](#composesh) below for more information)
 * `all-compose.sh {COMMAND}`: Run `./compose.sh {PROJECT} {COMMAND}` for all existing projects (that are having `STATUS=enabled` in their `.env` file)
 * `install.sh`: Checks the current environment, allows to install needed applications and setup the system services. You can run it as often as you want without damaging anything.
-* `project.sh {PROJECT}`: Adds new and edit existing projects. Interactive script to create a projects' `.env` file.
-* `service-action.sh`: Executes predefined actions in some services (e.g. backup&restore functionality) in service mariadb
-
+* `project.sh {PROJECT}`: Adds new and edit existing projects. Interactive script to create or update a projects' `.env` file.
+* `service-action.sh {PROJECT} {SERVICE} {COMMAND}`: Executes predefined actions in some services (e.g. backup&restore functionality in service mariadb)
+* `admin.sh {COMMAND}`: Control the system-services (=heart of this multi-project setup), like the backup and reverse-proxy. Like [compose.sh](#composesh), it is a wrapper for docker-compose.
 All scripts are tested with Ubuntu Linux.
 
 Note on scripts, allowing interactive setting modification: inputting no value will use the default value from the template (if it's a new project) or keep the existing value which was already
-set before (if existing project). The value which will be set is always shown: `========> Set FIELD (default: "value if you dont enter anything") to >:`).
-To clear an existing value, `""` will do the job. Required settings (having three exclamation marks `!!!`) can't be skipped, unless there is a default value.
+set before (if existing project). The value which will be set is always shown: `> FIELD (default: "value if you dont enter anything"):`).
+To clear an existing value, `""` will do the job. Required settings (red) can't be skipped, unless there is a default value.
 
 ### compose.sh
 This script is an important wrapper for executing docker-compose, which constructs the docker-compose command for a specified project and triggers build code for each used service, if available (see [Service structure](#service-structure) for more information). 
@@ -431,7 +386,10 @@ It can contain the following methods, which are triggered (replace "{service}" w
   - Parameter 1: PROJECT
 - **{service}Instructions**: These are displayed at the end after finishing the configuration of a project via `./project.sh`
   - Parameter 1: PROJECT
-- **{service}FieldDescriptions**: You can use a `\[script\]` placeholder in your `template.env` and replace it with the echo of this method if editing interactive using `./project.sh` command
+- **{service}FieldDescriptions**: You can use a `[SCRIPT]` placeholder in your `template.env` and replace it with the echo of this method if editing interactive using `./project.sh` command
+  - Parameter 1: PROJECT
+  - Parameter 2: FIELD
+- **{service}FieldDefaultValue**: You can use a `[DEFAULT-VALUE]` tag in field descriptions to set an initial value
   - Parameter 1: PROJECT
   - Parameter 2: FIELD
 
@@ -485,6 +443,25 @@ webserverFieldDescriptions() {
 }
 ```
 
+**Example for {service}FieldDefaultValue:**
+```bash
+wordpressFieldDefaultValue() {
+FIELD="$2"
+PROJECT="$1"
+
+    #PROJECT_ENV="applications/docker-data/$PROJECT/.env"
+
+    fields="WORDPRESS_AUTH_KEY WORDPRESS_SECURE_AUTH_KEY WORDPRESS_LOGGED_IN_KEY WORDPRESS_NONCE_KEY WORDPRESS_AUTH_SALT WORDPRESS_SECURE_AUTH_SALT WORDPRESS_LOGGED_IN_SALT WORDPRESS_NONCE_SALT"
+
+    for f in $fields; do
+      if [[ "$FIELD" == "$f" ]]; then
+        # Generate salt
+        </dev/urandom tr -dc 'A-Za-z0-9!#%&()*+,-./:;<=>?@[\]^_{|}~' | head -c 65  ; echo
+      fi
+    done
+}
+
+```
 #### template.env
 
 The env files need to follow exactly this structure, so it can be made interactive:
@@ -502,6 +479,7 @@ Tags with a special functionality:
 - `[REQUIRED]`: Fields with this tag needs a value (either provided as default value in `template.env`, newly entered by the user or already set when updating an existing project `.env` file)
 - `[BASIC-AUTH]`: If this is set, the user can enter a username and password which will be automatically encrypted to a proper basic-authentication string which traefik supports to protect applications.
 - `[SCRIPT]`: Please see the previous chapter [scripts.sh](#scriptssh), how these placeholder will be replaced. 
+- `[DEFAULT-VALUE]`: Can set an initial value via script if not set manually, see the previous chapter [scripts.sh](#scriptssh)
 
 ### Extending existing services
 For each service, the data is loaded in the following order (see [Service structure](#service-structure) for full paths):
