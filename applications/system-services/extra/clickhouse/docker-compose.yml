@@ -17,3 +17,4 @@ volumes:
 
 # TODO Set user/pw and create db ?!
 # TODO BACKUP-SOLUTION!!
+# https://hub.docker.com/r/alexakulov/clickhouse-backup

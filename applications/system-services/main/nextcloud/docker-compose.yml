@@ -29,6 +29,7 @@ services:
       - "SMTP_AUTHTYPE="
       - "MAIL_FROM_ADDRESS=${NEXTCLOUD_EMAIL_SENDER}"
       - "TRUSTED_PROXIES=traefik"
+      - "PHP_MEMORY_LIMIT=${NEXTCLOUD_PHP_MEMORY_LIMIT:-512M}"
     depends_on:
       - mariadb
       - redis
