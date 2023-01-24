@@ -1,0 +1,1 @@
+Grist is a modern relational spreadsheet. It combines the flexibility of a spreadsheet with the robustness of a database to organize your data and make you more productive. See https://www.getgrist.com/

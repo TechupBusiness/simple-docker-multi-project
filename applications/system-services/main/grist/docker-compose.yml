@@ -1,0 +1,33 @@
+version: '3.5'
+
+services:
+  grist:
+    image: gristlabs/grist:${GRIST_VERSION:-latest}
+#    build:
+#      context: ../../system-services/main/grist
+#      dockerfile: "app.Dockerfile"
+#      args:
+#        - GRIST_VERSION=${GRIST_VERSION}
+#        - UID=${USER_ID}
+#        - GID=${GROUP_ID}
+    restart: always
+    volumes:
+      - ../../instance-data/${PROJECT_NAME}/grist-persist:/persist
+    expose:
+      - 8484
+    environment:
+      - "GRIST_SESSION_SECRET=${GRIST_SECRET}"
+      - "APP_HOME_URL=https://${WEB_HOST}"
+      - "GRIST_SINGLE_ORG=${GRIST_SINGLE_ORG}"
+      - "GRIST_WIDGET_LIST_URL=${GRIST_WIDGET_SOURCE}"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=${PROXY_TMP_ENABLED}"
+      - "traefik.port=8484"
+      - "traefik.frontend.rule=Host:${PROXY_TMP_FE_HOST}"
+      - "traefik.frontend.auth.basic.users=${WEB_AUTH_BASIC}"
+      - "traefik.frontend.priority=${PROXY_TMP_PRIORITY}"
+      - "traefik.frontend.redirect.regex=^https?://(${PROXY_TMP_REGEX_REDIRECT})/(.*)"
+      - "traefik.frontend.redirect.replacement=https://${WEB_HOST}/$${2}"
+      - "traefik.frontend.redirect.permanent=true"
